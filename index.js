@@ -1,4 +1,4 @@
-const { makeDKA, randomWord, isWordAccepted } = require('./chomsky');
+const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
 
 (() => {
   const inputAlpabet = ['a', 'b', 'c', 'd', 'e'];
@@ -21,7 +21,7 @@ const { makeDKA, randomWord, isWordAccepted } = require('./chomsky');
     return decypheredText;
   };
 
-
+  // //////////
   const input = 'abcc';
   const cyphered = C(input);
   const decyphered = D(cyphered);
