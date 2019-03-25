@@ -39,31 +39,63 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
     }
   }
 
-  const recParse = (unparsed, parser, parsed = '', points = []) => {
-    if (unparsed.length === 0) { return parsed.split('').reverse().join(''); }
+  const D = (cypher) => {
+    let unparsed = cypher.split(',');
+    let parser = parseBackwards(unparsed);
+    let parsed = [];
+    const points = [];
 
-    const { done, value } = parser.next();
+    let done;
+    let value;
+    let remainingCypher;
 
-    if (done) {
-      if (points.length === 0) {
-        return 'Posos';
+
+    while (unparsed.length !== 0) {
+      ({ done, value } = parser.next());
+
+      if (done) {
+        if (points.length === 0) {
+          return 'Decyphering failed.';
+        }
+        [unparsed, parser, parsed] = points.pop();
+      } else {
+        remainingCypher = unparsed.slice(0, -value.subCypher.length);
+
+        points.push([unparsed, parser, parsed]);
+        unparsed = remainingCypher;
+        parser = parseBackwards(remainingCypher);
+        parsed = [value.decyphered, ...parsed];
       }
-      return recParse(...points.pop(), points);
     }
 
-    const remainingCypher = unparsed.slice(0, -value.subCypher.length);
-    return recParse(
-      remainingCypher,
-      parseBackwards(remainingCypher),
-      parsed.concat(value.decyphered),
-      [...points, [unparsed, parser, parsed]],
-    );
+    return parsed.join('');
   };
 
-  const D = (cypher) => {
-    const asList = cypher.split(',');
-    return recParse(asList, parseBackwards(asList));
-  };
+  // const recParse = (unparsed, parser, parsed = '', points = []) => {
+  //   if (unparsed.length === 0) { return parsed.split('').reverse().join(''); }
+
+  //   const { done, value } = parser.next();
+
+  //   if (done) {
+  //     if (points.length === 0) {
+  //       return 'Decyphering failed.';
+  //     }
+  //     return recParse(...points.pop(), points);
+  //   }
+
+  //   const remainingCypher = unparsed.slice(0, -value.subCypher.length);
+  //   return recParse(
+  //     remainingCypher,
+  //     parseBackwards(remainingCypher),
+  //     parsed.concat(value.decyphered),
+  //     [...points, [unparsed, parser, parsed]],
+  //   );
+  // };
+
+  // const D = (cypher) => {
+  //   const asList = cypher.split(',');
+  //   return recParse(asList, parseBackwards(asList));
+  // };
 
   // const parseCypher = (cypher) => {
   //   const parsingPoints = [];
@@ -139,7 +171,7 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
 
   // //////////
   const cyphered = C(input);
-  const decyphered = D(`_${cyphered}`);
+  const decyphered = D(`${cyphered}`);
 
   console.log(input);
   // console.log(cyphered);
