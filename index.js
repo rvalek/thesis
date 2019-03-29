@@ -4,7 +4,7 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
   const input = 'abcdeab';
 
   const inputAlpabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
-  const minCypherLengthPerLetter = 3;
+  const minCipherLengthPerLetter = 3;
 
   const letterToDKA = letters => letters.reduce(
     (acc, letter) => ({ ...acc, [letter]: makeDKA(letter) }), {},
@@ -13,63 +13,110 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
   const allDKAs = letterToDKA([...inputAlpabet]);
   const C = (secretText) => {
     const x = Array.from(secretText)
-      .map(letter => randomWord(allDKAs[letter], minCypherLengthPerLetter));
+      .map(letter => randomWord(allDKAs[letter], minCipherLengthPerLetter));
 
     return x.flat().join();
   };
 
   const acceptsWord = word => DKA => isWordAccepted(DKA, word);
-  const DKAsByEndingSymbol = letter => Object.values(allDKAs).filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
+  const DKAsWithTerminatingSymbol = letter => Object.values(allDKAs).filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
 
-  function* parseBackwards(cypher) {
-    const lastSymbol = cypher.slice(-1)[0];
-    const possibleDKAs = DKAsByEndingSymbol(lastSymbol);
+  // function* parseBackwards(cipher) {
+  //   const lastSymbol = cipher.slice(-1)[0];
+  //   const possibleDKAs = DKAsByEndingSymbol(lastSymbol);
 
-    if (!possibleDKAs) { return; }
+  //   if (!possibleDKAs) { return; }
 
-    for (let i = -minCypherLengthPerLetter, subCypher, acceptingDKAs; i >= -cypher.length; i -= 1) {
-      subCypher = cypher.slice(i);
-      acceptingDKAs = possibleDKAs.filter(acceptsWord(subCypher));
+  //   for (let i = -minCipherLengthPerLetter, subCipher, acceptingDKAs; i >= -cipher.length; i -= 1) {
+  //     subCipher = cipher.slice(i);
+  //     acceptingDKAs = possibleDKAs.filter(acceptsWord(subCipher));
 
-      if (acceptingDKAs) {
-        for (let j = 0; j < acceptingDKAs.length; j += 1) {
-          yield { decyphered: acceptingDKAs[j].cyphersLetter, subCypher };
-        }
+  //     if (acceptingDKAs) {
+  //       for (let j = 0; j < acceptingDKAs.length; j += 1) {
+  //         yield { deciphered: acceptingDKAs[j].ciphersLetter, subCipher };
+  //       }
+  //     }
+  //   }
+  // }
+
+  const decipherSuffix = (cipher, minSuffixLength) => {
+    const lastSymbol = cipher.slice(-1)[0];
+    const possibleDKAs = DKAsWithTerminatingSymbol(lastSymbol);
+
+    if (!possibleDKAs) { return null; }
+
+    let j = minSuffixLength;
+
+    for (let suffix, acceptingDKA; j >= -cipher.length; j -= 1) {
+      suffix = cipher.slice(j);
+      acceptingDKA = possibleDKAs.find(acceptsWord(suffix));
+
+      if (acceptingDKA !== undefined) {
+        return { decipheredLetter: acceptingDKA.ciphersLetter, suffixLength: j };
       }
     }
-  }
 
-  const D = (cypher) => {
-    let unparsed = cypher.split(',');
-    let parser = parseBackwards(unparsed);
-    let parsed = [];
-    const points = [];
+    return null;
+  };
 
-    let done;
-    let value;
-    let remainingCypher;
+  const properD = (cipher) => {
+    let unparsed = cipher.split(',');
+    let deciphered = [];
+    let suffixLength = -minCipherLengthPerLetter;
+    const continuationPoints = [];
 
+    let found;
 
     while (unparsed.length !== 0) {
-      ({ done, value } = parser.next());
+      found = decipherSuffix(unparsed, suffixLength);
+      if (found !== null) {
+        continuationPoints.push([unparsed, deciphered, found.suffixLength - 1]);
 
-      if (done) {
-        if (points.length === 0) {
-          return 'Decyphering failed.';
-        }
-        [unparsed, parser, parsed] = points.pop();
+        unparsed = unparsed.slice(0, found.suffixLength);
+        deciphered = [found.decipheredLetter, ...deciphered];
+        suffixLength = -minCipherLengthPerLetter;
       } else {
-        remainingCypher = unparsed.slice(0, -value.subCypher.length);
-
-        points.push([unparsed, parser, parsed]);
-        unparsed = remainingCypher;
-        parser = parseBackwards(remainingCypher);
-        parsed = [value.decyphered, ...parsed];
+        if (continuationPoints.length === 0) {
+          return 'Deciphering failed.';
+        }
+        [unparsed, deciphered, suffixLength] = continuationPoints.pop();
       }
     }
 
-    return parsed.join('');
+    return deciphered.join('');
   };
+
+  // const D = (cipher) => {
+  //   let unparsed = cipher.split(',');
+  //   let parser = parseBackwards(unparsed);
+  //   let parsed = [];
+  //   const points = [];
+
+  //   let done;
+  //   let value;
+  //   let remainingCipher;
+
+
+  //   while (unparsed.length !== 0) {
+  //     ({ done, value } = parser.next());
+
+  //     if (done) {
+  //       if (points.length === 0) {
+  //         return 'Deciphering failed.';
+  //       }
+  //       [unparsed, parser, parsed] = points.pop();
+  //     } else {
+  //       remainingCipher = unparsed.slice(0, -value.subCipher.length);
+
+  //       points.push([unparsed, parser, parsed]);
+  //       unparsed = remainingCipher;
+  //       parser = parseBackwards(remainingCipher);
+  //       parsed = [value.deciphered, ...parsed];
+  //     }
+  //   }
+
+  //   return parsed.join('');
+  // };
 
   // const recParse = (unparsed, parser, parsed = '', points = []) => {
   //   if (unparsed.length === 0) { return parsed.split('').reverse().join(''); }
@@ -78,31 +125,31 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
 
   //   if (done) {
   //     if (points.length === 0) {
-  //       return 'Decyphering failed.';
+  //       return 'Deciphering failed.';
   //     }
   //     return recParse(...points.pop(), points);
   //   }
 
-  //   const remainingCypher = unparsed.slice(0, -value.subCypher.length);
+  //   const remainingCipher = unparsed.slice(0, -value.subCipher.length);
   //   return recParse(
-  //     remainingCypher,
-  //     parseBackwards(remainingCypher),
-  //     parsed.concat(value.decyphered),
+  //     remainingCipher,
+  //     parseBackwards(remainingCipher),
+  //     parsed.concat(value.deciphered),
   //     [...points, [unparsed, parser, parsed]],
   //   );
   // };
 
-  // const D = (cypher) => {
-  //   const asList = cypher.split(',');
+  // const D = (cipher) => {
+  //   const asList = cipher.split(',');
   //   return recParse(asList, parseBackwards(asList));
   // };
 
-  // const parseCypher = (cypher) => {
+  // const parseCipher = (cipher) => {
   //   const parsingPoints = [];
   //   let currentPoint = {
-  //     // unparsed: cypher.match(/.{3}/g),
-  //     unparsed: cypher.split(','),
-  //     decyphered: '',
+  //     // unparsed: cipher.match(/.{3}/g),
+  //     unparsed: cipher.split(','),
+  //     deciphered: '',
   //   };
 
   //   while (currentPoint.unparsed.length > 0) {
@@ -110,33 +157,33 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
   //     const { done, value } = currentPoint.parser.next();
 
   //     if (!done) {
-  //       currentPoint.decyphered += value.decyphered;
-  //       currentPoint.unparsed.length -= value.subCypher.length;
+  //       currentPoint.deciphered += value.deciphered;
+  //       currentPoint.unparsed.length -= value.subCipher.length;
   //       parsingPoints.push({ ...currentPoint });
   //     } else {
-  //       if (parsingPoints.length === 0) { return 'Illegel cypher'; }
+  //       if (parsingPoints.length === 0) { return 'Illegel cipher'; }
   //       currentPoint = parsingPoints.pop();
   //     }
   //   }
 
-  //   return currentPoint.decyphered;
+  //   return currentPoint.deciphered;
   // };
 
 
-  // const D = (cypheredText) => {
+  // const D = (cipheredText) => {
   //   // const allDKAs = Object.entries(DKAs);
-  //   // const decypherWord = word => allDKAs
+  //   // const decipherWord = word => allDKAs
   //   //   .reduce((acc, [letter, dka]) => (isWordAccepted(dka, word) ? acc + letter : acc), '');
 
-  //   const input = cypheredText
+  //   const input = cipheredText
   //     .split(',');
-  //   const decypheredLetters = [];
+  //   const decipheredLetters = [];
 
 
   //   for (let i = input.length; i >= 0;) {
   //     const DKAs = DKAsByEndingSymbol(input[i]);
 
-  //     for (let j = i - minCypherLengthPerLetter - 1; ; j -= 1) {
+  //     for (let j = i - minCipherLengthPerLetter - 1; ; j -= 1) {
   //       if (j < 0) {
   //         return 'Illegal input';
   //       }
@@ -146,36 +193,36 @@ const { makeDKA, randomWord, isWordAccepted } = require('./lib/chomsky');
   //       const acceptingDKAs = DKAs.filter(acceptsWord(attemptingWord));
   //       if (acceptingDKAs.length !== 0) {
   //         i = j;
-  //         decypheredLetters.push(acceptingDKAs.map(getCypheredLetter));
+  //         decipheredLetters.push(acceptingDKAs.map(getCipheredLetter));
   //         break;
   //       }
   //     }
   //   }
 
-  //   return decypheredLetters;
+  //   return decipheredLetters;
   // };
 
-  // const parseCypher = (cypher, output, steps) => {
-  //   if (cypher.length === 0) return output;
+  // const parseCipher = (cipher, output, steps) => {
+  //   if (cipher.length === 0) return output;
 
-  //   const { cypherWord, letter } = findWord(cypher);
+  //   const { cipherWord, letter } = findWord(cipher);
 
   //   if (letter !== null) {
-  //     cypher.length -= cypherWord.length; // lel
+  //     cipher.length -= cipherWord.length; // lel
   //     output += letter;
-  //     parseCypher(cypher, output);
+  //     parseCipher(cipher, output);
   //   } else {
   //     return null;
   //   }
   // };
 
   // //////////
-  const cyphered = C(input);
-  const decyphered = D(`${cyphered}`);
+  const ciphered = C(input);
+  const deciphered = properD(`${ciphered}`);
 
   console.log(input);
-  // console.log(cyphered);
-  // console.log(isWordAccepted(allDKAs.a, cyphered.split(',')));
-  console.log(decyphered);
+  // console.log(ciphered);
+  // console.log(isWordAccepted(allDKAs.a, ciphered.split(',')));
+  console.log(deciphered);
   // console.log(acceptingCells);
 })();
