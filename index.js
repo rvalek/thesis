@@ -4,11 +4,11 @@ const robert = require('./lib/robert');
 
 (() => {
   // const inputAlphabet = 'abcdefghijklmnopqrstuvwxyz';
-  const inputAlphabet = ['a', 'b', 'c'];
+  const inputAlphabet = ['a', 'b', 'c', 'd', 'e'];
   const alpaDKAs = dkasForAlpabet(inputAlphabet);
   const system = robert(alpaDKAs);
 
-  const input = 'aac';
+  const input = 'accba';
 
   console.log(`Secret text: ${input}`);
   writeHTML(alpaDKAs);
