@@ -1,17 +1,29 @@
-const { dkasForAlpabet, writeHTML } = require('./lib/chomsky');
+const {
+  dkasForAlphabet, writeHTML, saveJSON, readJSON,
+} = require('./lib/chomsky');
 const robert = require('./lib/robert');
 
 
 (() => {
   // const inputAlphabet = 'abcdefghijklmnopqrstuvwxyz';
   const inputAlphabet = ['a', 'b', 'c', 'd', 'e'];
-  const alpaDKAs = dkasForAlpabet(inputAlphabet);
-  const system = robert(alpaDKAs);
+  let alphaDKAs;
+
+  const newDKAs = false;
+  if (newDKAs) {
+    alphaDKAs = dkasForAlphabet(inputAlphabet);
+    saveJSON(alphaDKAs);
+    writeHTML(alphaDKAs);
+  } else {
+    alphaDKAs = readJSON();
+  }
+
+
+  const system = robert(alphaDKAs);
 
   const input = 'accba';
 
   console.log(`Secret text: ${input}`);
-  writeHTML(alpaDKAs);
 
   const encrypted = system.encrypt(input);
   console.log(`Encrypted text: ${encrypted}`);
