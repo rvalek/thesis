@@ -5,11 +5,11 @@ const robert = require('./lib/robert');
 
 
 (() => {
+  const newDKAs = false;
+
   // const inputAlphabet = 'abcdefghijklmnopqrstuvwxyz';
   const inputAlphabet = ['a', 'b', 'c', 'd', 'e'];
   let alphaDKAs;
-
-  const newDKAs = false;
   if (newDKAs) {
     alphaDKAs = dkasForAlphabet(inputAlphabet);
     saveJSON(alphaDKAs);
@@ -17,12 +17,10 @@ const robert = require('./lib/robert');
   } else {
     alphaDKAs = readJSON();
   }
-
-
   const system = robert(alphaDKAs);
 
-  const input = 'accba';
 
+  const input = 'accba';
   console.log(`Secret text: ${input}`);
 
   const encrypted = system.encrypt(input);
