@@ -1,6 +1,4 @@
-const {
-  dkasForAlphabet, writeHTML, saveJSON, readJSON,
-} = require('./lib/chomsky');
+const chom = require('./lib/chomsky');
 const robert = require('./lib/robert');
 
 
@@ -11,11 +9,11 @@ const robert = require('./lib/robert');
   const inputAlphabet = ['a', 'b', 'c', 'd', 'e'];
   let alphaDKAs;
   if (newDKAs) {
-    alphaDKAs = dkasForAlphabet(inputAlphabet);
-    saveJSON(alphaDKAs);
-    writeHTML(alphaDKAs);
+    alphaDKAs = chom.dkasForAlphabet(inputAlphabet);
+    chom.saveJSON(alphaDKAs);
+    chom.writeHTML(alphaDKAs);
   } else {
-    alphaDKAs = readJSON();
+    alphaDKAs = chom.readJSON();
   }
   const system = robert(alphaDKAs);
 
