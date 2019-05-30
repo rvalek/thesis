@@ -1,9 +1,7 @@
-const { writeFile, readFileSync } = require('fs');
 const nn = require('./nn');
+const config = require('../config');
 
 module.exports = (() => {
-  // Allow multiple accepting cells per DKA?
-
   const allAcceptingCells = new Set();
   const getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)];
   const randomUniqueCell = (dka) => {
@@ -21,7 +19,7 @@ module.exports = (() => {
   const findTransitionIndex = (dka, state, symbol) => parseInt(state.slice(1), 10) * dka.alphabet.length
     + dka.alphabet.indexOf(symbol);
 
-  const makeDKA = (letter = '', alphabetSize = 26, operationalStates = 8) => {
+  const makeDKA = (letter = '', alphabetSize = config.fsmNumSymbols, operationalStates = config.fsmNumStates) => {
     const newDka = nn.createRandomFsm(operationalStates, alphabetSize);
     newDka.ciphersLetter = letter;
 
@@ -44,16 +42,7 @@ module.exports = (() => {
     return newDka;
   };
 
-  const dkasForAlphabet = (alphabet) => {
-    const DKAs = {};
-    let letter;
-    for (let i = 0; i < alphabet.length; i += 1) {
-      letter = alphabet[i];
-      DKAs[letter] = makeDKA(letter);
-    }
-
-    return DKAs;
-  };
+  const dkasForAlphabet = alphabet => Array.from(alphabet).reduce((acc, letter) => ({ [letter]: makeDKA(letter), ...acc }), {});
 
   const randomWord = (DKA, minLength, maxLength = 7) => {
     const word = nn.randomStringInLanguage(DKA, minLength, maxLength);
@@ -73,35 +62,11 @@ module.exports = (() => {
   const dkasWithTerminatingSymbol = (dkas, letter) => Object.values(dkas)
     .filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
 
-
-  const htmlFileName = './out/dkas.html';
-  const writeHTML = (DKAs) => {
-    const html = `<!DOCTYPE html><html><head></head><body>
-    ${Object.entries(DKAs).map(([letter, dka]) => nn.printHtmlTable(dka, letter)).join('</br>')}
-    </body></html>`;
-
-    writeFile(htmlFileName, html, (err) => {
-      if (err) {
-        return console.log(err);
-      }
-
-      console.log(`Wrote DKAs to ${htmlFileName}`);
-    });
-  };
-
-  const jsonFileName = './out/alpaDKAs.json';
-  const saveJSON = (obj) => {
-    writeFile(jsonFileName, JSON.stringify(obj), (err) => {
-      if (err) {
-        return console.log(err);
-      }
-
-      console.log(`Wrote alpaDKAs to ${jsonFileName}`);
-    });
-  };
-  const readJSON = () => JSON.parse(readFileSync(jsonFileName));
+  const makeHTML = FSMs => `<!DOCTYPE html><html><head></head><body>
+    ${Object.entries(FSMs).map(([letter, dka]) => nn.printHtmlTable(dka, letter)).join('</br>')}
+  </body></html>`;
 
   return {
-    readJSON, saveJSON, dkasForAlphabet, randomWord, isWordAccepted, writeHTML, dkasWithTerminatingSymbol,
+    dkasForAlphabet, randomWord, isWordAccepted, dkasWithTerminatingSymbol, makeDKA, makeHTML,
   };
 })();

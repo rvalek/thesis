@@ -4,14 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cli-table": ">=0.2.0",
-    "structure.js": ">=0.0.x"
+    "commander": "^2.20.0",
+    "structure.js": "0.0.2"
   },
   "devDependencies": {
     "eslint": "^5.14.1",

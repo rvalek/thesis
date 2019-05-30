@@ -1,4 +1,4 @@
-const noam = require('./noam');
+const noam = require('../lib/_noam');
 
 module.exports = (() => {
   const latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -45,7 +45,7 @@ module.exports = (() => {
       newFsm.alphabet = latinAlphabet.substr(0, numAlphabet).split('');
     }
 
-    newFsm.initialState = newFsm.states[0];
+    [newFsm.initialState] = newFsm.states;
 
     newFsm.acceptingStates = [];
     for (let i = 0; i < numStates; i += 1) {
@@ -81,6 +81,7 @@ module.exports = (() => {
     }
 
 
+    // yo?
     if (maxNumToStates > 1) {
       newFsm = noam.fsm.convertNfaToDfa(newFsm);
       newFsm = noam.fsm.minimize(newFsm);
@@ -89,7 +90,8 @@ module.exports = (() => {
     return newFsm;
   };
 
-  const randomStringInLanguage = (fsm, lowerBoundary, upperBoundary, n = 1) => {
+  // Max length is not guaranteed
+  const randomStringInLanguage = (fsm, minLength, maxLength, n = 1) => {
     const newFsm = fsm;
 
     if (newFsm.acceptingStates.length === 0) {
@@ -102,7 +104,7 @@ module.exports = (() => {
     while (true) {
       if (currentState === newFsm.initialState) {
         // !!! Changed if (Math.round(Math.random())) to this, which doesn't do much tbh
-        if (trail.length >= lowerBoundary && Math.round(Math.random()) || trail.length >= upperBoundary) {
+        if (trail.length >= minLength && Math.round(Math.random()) || trail.length >= maxLength) {
           break;
         }
       }
@@ -145,7 +147,7 @@ module.exports = (() => {
       const transition = fsm.transitions[i];
 
       if (fsm.transitions[i].symbol === symbol
-                && states.includes(transition.fromState)) {
+        && states.includes(transition.fromState)) {
         for (let j = 0; j < transition.toStates.length; j += 1) {
           if (!targetStates.includes(transition.toStates[j])) {
             targetStates.push(transition.toStates[j]);
