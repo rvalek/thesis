@@ -1,3 +1,5 @@
+const config = require('../config');
+
 module.exports = (() => {
   const _makeTransition = (fsm, states, symbol) => {
     if (!fsm.alphabet.includes(symbol)) {
@@ -14,7 +16,7 @@ module.exports = (() => {
       const transition = fsm.transitions[i];
 
       if (fsm.transitions[i].symbol === symbol
-                && states.includes(transition.fromState)) {
+        && states.includes(transition.fromState)) {
         for (let j = 0; j < transition.toStates.length; j += 1) {
           if (!targetStates.includes(transition.toStates[j])) {
             targetStates.push(transition.toStates[j]);
@@ -41,12 +43,7 @@ module.exports = (() => {
     return states;
   };
 
-  // Max boundary is not guaranteed
-  const generate = (fsm, minLength, maxLength = 7) => {
-    if (fsm.acceptingStates.length === 0) {
-      return null;
-    }
-
+  const _genOneWord = (fsm, minLength, maxLength) => {
     let currentState = fsm.acceptingStates[Math.floor(Math.random() * fsm.acceptingStates.length)];
     const trail = [];
 
@@ -82,6 +79,17 @@ module.exports = (() => {
     console.log(`Ciphered ${fsm.ciphersLetter} as ${word}`);
 
     return word;
+  };
+
+  // Max boundary is not guaranteed
+  const generate = (fsm, minLength = config.minCypherLengthPerSourceLetter, maxLength = 7, num = 1) => {
+    if (fsm.acceptingStates.length === 0) {
+      return null;
+    }
+
+    return num === 1
+      ? _genOneWord(fsm, minLength, maxLength)
+      : Array(num).fill().map(() => _genOneWord(fsm, minLength, maxLength));
   };
 
   const isAccepted = (fsm, word) => {
