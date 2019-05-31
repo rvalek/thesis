@@ -1,4 +1,4 @@
-const noam = require('../lib/_noam');
+// const noam = require('../lib/_noam');
 const config = require('../config');
 
 module.exports = (() => {
@@ -19,7 +19,7 @@ module.exports = (() => {
 
   // generate random fsm
   const _createRandomFsm = (numStates, numAlphabet, maxNumToStates = 1) => {
-    let newFsm = {};
+    const newFsm = {};
 
     function prefix(ch, num, str) {
       let retStr = str;
@@ -83,10 +83,10 @@ module.exports = (() => {
 
 
     // yo?
-    if (maxNumToStates > 1) {
-      newFsm = noam.fsm.convertNfaToDfa(newFsm);
-      newFsm = noam.fsm.minimize(newFsm);
-    }
+    // if (maxNumToStates > 1) {
+    //   newFsm = noam.fsm.convertNfaToDfa(newFsm);
+    //   newFsm = noam.fsm.minimize(newFsm);
+    // }
 
     return newFsm;
   };

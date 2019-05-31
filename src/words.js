@@ -1,6 +1,6 @@
 module.exports = (() => {
   // Max length is not guaranteed
-  const _randomStringInLanguage = (fsm, minLength, maxLength, n = 1) => {
+  const _randomStringInLanguage = (fsm, minLength, maxLength) => {
     const newFsm = fsm;
 
     if (newFsm.acceptingStates.length === 0) {
@@ -10,7 +10,7 @@ module.exports = (() => {
     let currentState = newFsm.acceptingStates[Math.floor(Math.random() * newFsm.acceptingStates.length)];
     const trail = [];
 
-    while (true) {
+    for (;;) {
       if (currentState === newFsm.initialState) {
         // !!! Changed if (Math.round(Math.random())) to this, which doesn't do much tbh
         if (trail.length >= minLength && Math.round(Math.random()) || trail.length >= maxLength) {
