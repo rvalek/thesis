@@ -1,46 +1,4 @@
 module.exports = (() => {
-  // Max length is not guaranteed
-  const _randomStringInLanguage = (fsm, minLength, maxLength) => {
-    const newFsm = fsm;
-
-    if (newFsm.acceptingStates.length === 0) {
-      return null;
-    }
-
-    let currentState = newFsm.acceptingStates[Math.floor(Math.random() * newFsm.acceptingStates.length)];
-    const trail = [];
-
-    for (;;) {
-      if (currentState === newFsm.initialState) {
-        // !!! Changed if (Math.round(Math.random())) to this, which doesn't do much tbh
-        if (trail.length >= minLength && Math.round(Math.random()) || trail.length >= maxLength) {
-          break;
-        }
-      }
-
-      const transitions = [];
-
-      for (let i = 0; i < newFsm.transitions.length; i += 1) {
-        if (newFsm.transitions[i].toStates[0] === currentState) {
-          transitions.push(newFsm.transitions[i]);
-        }
-      }
-
-      if (transitions.length === 0) {
-        break;
-      }
-
-      const transition = transitions[Math.floor(Math.random() * transitions.length)];
-
-      trail.push(transition.symbol);
-      currentState = transition.fromState;
-    }
-
-    trail.reverse();
-
-    return trail;
-  };
-
   const _makeTransition = (fsm, states, symbol) => {
     if (!fsm.alphabet.includes(symbol)) {
       throw new Error('FSM must contain all symbols for which the transition is being computed');
@@ -83,10 +41,45 @@ module.exports = (() => {
     return states;
   };
 
+  // Max boundary is not guaranteed
+  const generate = (fsm, minLength, maxLength = 7) => {
+    if (fsm.acceptingStates.length === 0) {
+      return null;
+    }
 
-  const generate = (DKA, minLength, maxLength = 7) => {
-    const word = _randomStringInLanguage(DKA, minLength, maxLength);
-    console.log(`Ciphered ${DKA.ciphersLetter} as ${word.join('')}`);
+    let currentState = fsm.acceptingStates[Math.floor(Math.random() * fsm.acceptingStates.length)];
+    const trail = [];
+
+    for (; ;) {
+      if (currentState === fsm.initialState) {
+        // !!! Changed if (Math.round(Math.random())) to this, which doesn't do much tbh
+        if (trail.length >= minLength && Math.round(Math.random()) || trail.length >= maxLength) {
+          break;
+        }
+      }
+
+      const transitions = [];
+
+      for (let i = 0; i < fsm.transitions.length; i += 1) {
+        if (fsm.transitions[i].toStates[0] === currentState) {
+          transitions.push(fsm.transitions[i]);
+        }
+      }
+
+      if (transitions.length === 0) {
+        break;
+      }
+
+      const transition = transitions[Math.floor(Math.random() * transitions.length)];
+
+      trail.push(transition.symbol);
+      currentState = transition.fromState;
+    }
+
+    trail.reverse();
+
+    const word = trail.join('');
+    console.log(`Ciphered ${fsm.ciphersLetter} as ${word}`);
 
     return word;
   };
