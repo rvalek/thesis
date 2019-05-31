@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.20.0",
+    "string-similarity": "^3.0.0",
     "structure.js": "0.0.2"
   },
   "devDependencies": {

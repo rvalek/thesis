@@ -1,17 +1,21 @@
 
-const chom = require('./chom');
+const words = require('./words');
 const config = require('../config');
 
 
 module.exports = (allDKAs) => {
   const encrypt = secretText => Array.from(secretText)
-    .map(letter => chom.randomWord(allDKAs[letter], config.minCypherLengthPerSourceLetter))
+    .map(letter => words.generate(allDKAs[letter], config.minCypherLengthPerSourceLetter))
     .flat()
     .join('');
 
-  const _acceptsWord = word => DKA => chom.isWordAccepted(DKA, word);
+  const _acceptsWord = word => DKA => words.isAccepted(DKA, word);
+  const _dkasWithTeminatingSymbol = letter => Object.values(allDKAs)
+    .filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
+
+
   const _decipherSuffix = (subCipher, minSuffixLength) => {
-    const possibleDKAs = chom.dkasWithTerminatingSymbol(allDKAs, subCipher[subCipher.length - 1]);
+    const possibleDKAs = _dkasWithTeminatingSymbol(subCipher[subCipher.length - 1]);
 
     if (!possibleDKAs) { return false; }
 
