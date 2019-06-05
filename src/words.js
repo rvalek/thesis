@@ -43,14 +43,13 @@ module.exports = (() => {
     return states;
   };
 
-  const _genOneWord = (fsm, minLength, maxLength) => {
+  const _genOneWord = (fsm, minLength) => {
     let currentState = fsm.acceptingStates[Math.floor(Math.random() * fsm.acceptingStates.length)];
     const trail = [];
 
     for (; ;) {
       if (currentState === fsm.initialState) {
-        // !!! Changed if (Math.round(Math.random())) to this, which doesn't do much tbh
-        if (trail.length >= minLength && Math.round(Math.random()) || trail.length >= maxLength) {
+        if (trail.length >= minLength) {
           break;
         }
       }
@@ -82,14 +81,14 @@ module.exports = (() => {
   };
 
   // Max boundary is not guaranteed
-  const generate = (fsm, minLength = config.minCypherLengthPerSourceLetter, maxLength = 7, num = 1) => {
+  const generate = (fsm, minLength = config.minCypherLengthPerSourceLetter, num = 1) => {
     if (fsm.acceptingStates.length === 0) {
       return null;
     }
 
     return num === 1
-      ? _genOneWord(fsm, minLength, maxLength)
-      : Array(num).fill().map(() => _genOneWord(fsm, minLength, maxLength));
+      ? _genOneWord(fsm, minLength)
+      : Array(num).fill().map(() => _genOneWord(fsm, minLength));
   };
 
   const isAccepted = (fsm, word) => {

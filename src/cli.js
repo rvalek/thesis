@@ -10,8 +10,8 @@ module.exports = (() => {
 
   program
   // .version('0.1.0')
-    .option('-n, --new', 'Generate new FSMs')
-    .option('-i, --input <word>', 'Input word for encryption', validateInput)
+    .option('-n, --new', 'generate new FSMs')
+    .option('-i, --input <word>', 'input word for encryption', validateInput)
     .parse(process.argv);
 
   return program;

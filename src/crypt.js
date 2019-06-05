@@ -5,7 +5,7 @@ const config = require('../config');
 
 module.exports = (allDKAs) => {
   const encrypt = secretText => Array.from(secretText)
-    .map(letter => words.generate(allDKAs[letter], config.minCypherLengthPerSourceLetter))
+    .map(letter => words.generate(allDKAs[letter]))
     .flat()
     .join('');
 
