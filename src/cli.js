@@ -8,8 +8,10 @@ module.exports = (() => {
     throw Error(`Input alphabet is limited to: ${config.sourceAlphabet}`);
   };
 
+
+  // Add configuration?
   program
-  // .version('0.1.0')
+    .version('0.3.6')
     .option('-n, --new', 'generate new FSMs')
     .option('-i, --input <word>', 'input word for encryption', validateInput)
     .parse(process.argv);
