@@ -16,7 +16,7 @@ module.exports = (() => {
     );
 
   // Produces a random word of certain minimal length, accepted by a given machine.
-  const _genOneWord = (fsm, minLength = 1) => {
+  const _generateSingle = (fsm, minLength = 1) => {
     const trail = [];
     let currentState = util.getRandomElement(fsm.acceptingStates);
     const leadsToCurrentState = trans => trans.toStates.includes(currentState);
@@ -42,16 +42,16 @@ module.exports = (() => {
     return word;
   };
 
-  // Produces requested numer of random string, accepted by a given machine.
+  // Produces requested number of random string, accepted by a given machine.
   const generate = (
     fsm,
     num = 1,
     minLength = config.minCypherLengthPerSourceLetter,
   ) => (num === 1
-      ? _genOneWord(fsm, minLength)
+      ? _generateSingle(fsm, minLength)
       : Array(num)
           .fill()
-          .map(() => _genOneWord(fsm, minLength)));
+          .map(() => _generateSingle(fsm, minLength)));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));

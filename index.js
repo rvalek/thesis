@@ -12,7 +12,7 @@ const machines = require('./src/machines');
 
 
   const system = crypt(cli.new
-    ? io.save(config.fsmSavePath, machines.forAlphabet(config.sourceAlphabet))
+    ? io.save(config.fsmSavePath, machines.generate(config.sourceAlphabet))
     : io.read(config.fsmSavePath));
 
   const encrypted = system.encrypt(input);

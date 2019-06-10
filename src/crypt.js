@@ -1,38 +1,40 @@
-
 const words = require('./words');
 const config = require('../config');
 
-
-module.exports = (allDKAs) => {
-  const encrypt = secretText => Array.from(secretText)
-    .map(letter => words.generate(allDKAs[letter]))
-    .flat()
-    .join('');
-
+module.exports = (FSMs) => {
   const _acceptsWord = word => DKA => words.isAccepted(DKA, word);
-  const _dkasWithTeminatingSymbol = letter => Object.values(allDKAs)
-    .filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
+  const _dkasWithTeminatingSymbol = letter => Object.values(FSMs).filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
-    const possibleDKAs = _dkasWithTeminatingSymbol(subCipher[subCipher.length - 1]);
+    const possibleDKAs = _dkasWithTeminatingSymbol(
+      subCipher[subCipher.length - 1],
+    );
 
-    if (!possibleDKAs) { return false; }
+    if (!possibleDKAs) {
+      return null;
+    }
 
-    for (let suffixLength = minSuffixLength, acceptingDKA; suffixLength >= -subCipher.length; suffixLength -= 1) {
-      acceptingDKA = possibleDKAs.find(_acceptsWord(subCipher.slice(suffixLength)));
+    for (
+      let suffixLength = minSuffixLength, acceptingDKA;
+      suffixLength >= -subCipher.length;
+      suffixLength -= 1
+    ) {
+      acceptingDKA = possibleDKAs.find(
+        _acceptsWord(subCipher.slice(suffixLength)),
+      );
 
       if (acceptingDKA !== undefined) {
         return { decipheredLetter: acceptingDKA.ciphersLetter, suffixLength };
       }
     }
 
-    return false;
+    return null;
   };
 
-  const decrypt = (cipher) => {
+  const decrypt = (cipher, minLengthPerLetter = config.minCypherLengthPerSourceLetter) => {
     let unparsed = cipher;
     let deciphered = '';
-    let suffixLength = -config.minCypherLengthPerSourceLetter;
+    let suffixLength = -minLengthPerLetter;
     const continuationPoints = [];
 
     let found;
@@ -53,15 +55,24 @@ module.exports = (allDKAs) => {
       }
     }
 
-    console.log(`Decryption successful. Steps:\n${continuationPoints
-      .map(([remainingCipher, alreadyDeciphered]) => `${remainingCipher} | ${alreadyDeciphered}`)
-      .join('\t\n')}`);
+    if (config.logging) {
+      console.log(
+        `Decryption successful. Steps:\n${continuationPoints
+          .map(([remainingCipher, alreadyDeciphered]) => `${remainingCipher} | ${alreadyDeciphered}`)
+          .join('\t\n')}`,
+      );
+    }
 
     return deciphered;
   };
 
+  // Produces a cipher string for a given source string.
+  const encrypt = sourceText => Array.from(sourceText)
+      .map(letter => words.generate(FSMs[letter]))
+      .join('');
 
   return {
-    encrypt, decrypt,
+    encrypt,
+    decrypt,
   };
 };
