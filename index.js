@@ -2,12 +2,14 @@
 const crypt = require('./src/crypt');
 const io = require('./src/io');
 const config = require('./config');
-const cli = require('./src/cli');
+const cli = require('./cli');
 const machines = require('./src/machines');
 
 
 (() => {
   const input = cli.input || 'accba';
+  io.validateInput(input);
+
 
   const system = crypt(cli.new
     ? io.save(config.fsmSavePath, machines.forAlphabet(config.sourceAlphabet))

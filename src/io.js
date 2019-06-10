@@ -1,5 +1,5 @@
 const { writeFile, readFileSync } = require('fs');
-
+const config = require('../config');
 
 module.exports = (() => {
   const _htmlTable = (fsm) => {
@@ -15,8 +15,11 @@ module.exports = (() => {
         tableRows[i][j] = { text: [] };
       }
       tableRows[i][0] = { text: fsm.states[i].toString() };
-      tableRows[i][headers.length - 1] = fsm.acceptingStates.includes(fsm.states[i])
-        ? { text: ['1'] } : { text: ['0'] };
+      tableRows[i][headers.length - 1] = fsm.acceptingStates.includes(
+        fsm.states[i],
+      )
+        ? { text: ['1'] }
+        : { text: ['0'] };
     }
 
     for (let i = 0; i < fsm.transitions.length; i += 1) {
@@ -97,5 +100,12 @@ module.exports = (() => {
 
   const read = fromPath => JSON.parse(readFileSync(`${fromPath}.json`));
 
-  return { save, read };
+  const validateInput = (word) => {
+    if (Array.from(word).every(letter => config.sourceAlphabet.includes(letter))) {
+      return word;
+    }
+    throw Error(`Input alphabet is limited to: ${config.sourceAlphabet}`);
+  };
+
+  return { save, read, validateInput };
 })();

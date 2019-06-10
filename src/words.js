@@ -1,103 +1,60 @@
 const config = require('../config');
+const util = require('./util');
 
 module.exports = (() => {
-  const _makeTransition = (fsm, states, symbol) => {
-    if (!fsm.alphabet.includes(symbol)) {
-      throw new Error("Some input symbols are not in machine's alphabet!");
-    }
+  // Produces a set of target states from given states and a symbol.
+  const _makeTransition = (fsm, fromStates, symbol) => new Set(
+      fsm.transitions
+        .filter(t => t.symbol === symbol && fromStates.includes(t.fromState))
+        .reduce((accStates, t) => [...accStates, ...t.toStates], []),
+    );
 
-    const targetStates = [];
+  // Produces the resulting state of a given machine after reading a string.
+  const _readString = (fsm, inputString) => Array.from(inputString).reduce(
+      (accStates, symbol) => Array.from(_makeTransition(fsm, accStates, symbol)),
+      [fsm.initialState],
+    );
 
-    for (let i = 0; i < fsm.transitions.length; i += 1) {
-      const transition = fsm.transitions[i];
-
-      if (fsm.transitions[i].symbol === symbol
-        && states.includes(transition.fromState)) {
-        for (let j = 0; j < transition.toStates.length; j += 1) {
-          if (!targetStates.includes(transition.toStates[j])) {
-            targetStates.push(transition.toStates[j]);
-          }
-        }
-      }
-    }
-
-    return targetStates;
-  };
-
-  // read a stream of input symbols and determine target states
-  const _readString = (fsm, inputString) => {
-    const inputArray = Array.from(inputString);
-
-    if (inputArray.some(inputSymb => !fsm.alphabet.includes(inputSymb))) {
-      throw new Error("Some input symbols are not in machine's alphabet!");
-    }
-
-    return inputArray.reduce((accStates, nextSymbol) => _makeTransition(fsm, accStates, nextSymbol), [fsm.initialState]);
-
-    // let states = [fsm.initialState];
-
-    // for (let i = 0; i < inputString.length; i += 1) {
-    //   states = _makeTransition(fsm, states, inputString[i]);
-    // }
-
-    // return states;
-  };
-
-  const _genOneWord = (fsm, minLength) => {
-    let currentState = fsm.acceptingStates[Math.floor(Math.random() * fsm.acceptingStates.length)];
+  // Produces a random word of certain minimal length, accepted by a given machine.
+  const _genOneWord = (fsm, minLength = 1) => {
     const trail = [];
+    let currentState = util.getRandomElement(fsm.acceptingStates);
+    const leadsToCurrentState = trans => trans.toStates.includes(currentState);
 
-    for (; ;) {
-      if (currentState === fsm.initialState) {
-        if (trail.length >= minLength) {
-          break;
-        }
-      }
-
-      const transitions = [];
-
-      for (let i = 0; i < fsm.transitions.length; i += 1) {
-        if (fsm.transitions[i].toStates[0] === currentState) {
-          transitions.push(fsm.transitions[i]);
-        }
-      }
-
+    let transitions;
+    while (trail.length < minLength || currentState !== fsm.initialState) {
+      transitions = fsm.transitions.filter(leadsToCurrentState);
       if (transitions.length === 0) {
         break;
       }
 
-      const transition = transitions[Math.floor(Math.random() * transitions.length)];
-
-      trail.push(transition.symbol);
-      currentState = transition.fromState;
+      const { symbol, fromState } = util.getRandomElement(transitions);
+      trail.push(symbol);
+      currentState = fromState;
     }
 
-    trail.reverse();
+    const word = trail.reverse().join('');
 
-    const word = trail.join('');
-    console.log(`Ciphered ${fsm.ciphersLetter} as ${word}`);
+    if (config.logging) {
+      console.log(`Ciphered ${fsm.ciphersLetter} as ${word}`);
+    }
 
     return word;
   };
 
-  // Max boundary is not guaranteed
-  const generate = (fsm, minLength = config.minCypherLengthPerSourceLetter, num = 1) => {
-    if (fsm.acceptingStates.length === 0) {
-      return null;
-    }
-
-    return num === 1
+  // Produces requested numer of random string, accepted by a given machine.
+  const generate = (
+    fsm,
+    num = 1,
+    minLength = config.minCypherLengthPerSourceLetter,
+  ) => (num === 1
       ? _genOneWord(fsm, minLength)
-      : Array(num).fill().map(() => _genOneWord(fsm, minLength));
-  };
+      : Array(num)
+          .fill()
+          .map(() => _genOneWord(fsm, minLength)));
 
-  const isAccepted = (fsm, word) => {
-    try {
-      return _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));
-    } catch (e) {
-      return false;
-    }
-  };
+  // A predicate of whether reading a given word results in accepting state by a machine.
+  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));
 
   return { generate, isAccepted };
 })();

@@ -1,4 +1,4 @@
-// const noam = require('../lib/_noam');
+const util = require('../src/util');
 const config = require('../config');
 
 module.exports = (() => {
@@ -92,10 +92,9 @@ module.exports = (() => {
   };
 
   const _allAcceptingCells = new Set();
-  const _getRandomElement = arr => arr[Math.floor(Math.random() * arr.length)];
   const _randomUniqueCell = (dka) => {
-    const symbol = _getRandomElement(dka.alphabet);
-    const state = _getRandomElement(dka.states);
+    const symbol = util.getRandomElement(dka.alphabet);
+    const state = util.getRandomElement(dka.states);
     const asText = `${symbol}:${state}`;
 
     if (_allAcceptingCells.has(asText)) return _randomUniqueCell(dka);

@@ -5,4 +5,5 @@ module.exports = {
   fsmNumStates: 6,
   minCypherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/FSMs',
+  logging: true,
 };

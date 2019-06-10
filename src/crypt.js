@@ -13,7 +13,6 @@ module.exports = (allDKAs) => {
   const _dkasWithTeminatingSymbol = letter => Object.values(allDKAs)
     .filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
 
-
   const _decipherSuffix = (subCipher, minSuffixLength) => {
     const possibleDKAs = _dkasWithTeminatingSymbol(subCipher[subCipher.length - 1]);
 
