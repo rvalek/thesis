@@ -3,11 +3,7 @@ const config = require('../config');
 module.exports = (() => {
   const _makeTransition = (fsm, states, symbol) => {
     if (!fsm.alphabet.includes(symbol)) {
-      throw new Error('FSM must contain all symbols for which the transition is being computed');
-    }
-
-    if (states.some(inputSymb => !fsm.states.includes(inputSymb))) {
-      throw new Error('FSM must contain all symbols for which the transition is being computed');
+      throw new Error("Some input symbols are not in machine's alphabet!");
     }
 
     const targetStates = [];
@@ -29,18 +25,22 @@ module.exports = (() => {
   };
 
   // read a stream of input symbols and determine target states
-  const _readString = (fsm, inputSymbolStream) => {
-    if (Array.from(inputSymbolStream).some(inputSymb => !fsm.alphabet.includes(inputSymb))) {
-      throw new Error('FSM must contain all symbols for which the transition is being computed');
+  const _readString = (fsm, inputString) => {
+    const inputArray = Array.from(inputString);
+
+    if (inputArray.some(inputSymb => !fsm.alphabet.includes(inputSymb))) {
+      throw new Error("Some input symbols are not in machine's alphabet!");
     }
 
-    let states = [fsm.initialState];
+    return inputArray.reduce((accStates, nextSymbol) => _makeTransition(fsm, accStates, nextSymbol), [fsm.initialState]);
 
-    for (let i = 0; i < inputSymbolStream.length; i += 1) {
-      states = _makeTransition(fsm, states, inputSymbolStream[i]);
-    }
+    // let states = [fsm.initialState];
 
-    return states;
+    // for (let i = 0; i < inputString.length; i += 1) {
+    //   states = _makeTransition(fsm, states, inputString[i]);
+    // }
+
+    // return states;
   };
 
   const _genOneWord = (fsm, minLength) => {

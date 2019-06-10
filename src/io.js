@@ -2,8 +2,8 @@ const { writeFile, readFileSync } = require('fs');
 
 
 module.exports = (() => {
-  const _htmlTable = (fsm, ciphersLetter = '') => {
-    const headers = [`<i>${ciphersLetter}</i>`].concat(fsm.alphabet);
+  const _htmlTable = (fsm) => {
+    const headers = [`<i>${fsm.ciphersLetter}</i>`].concat(fsm.alphabet);
 
     headers.push('');
 
@@ -71,7 +71,7 @@ module.exports = (() => {
   };
 
   const _makeHTML = FSMs => `<!DOCTYPE html><html><head></head><body>
-  ${Object.entries(FSMs).map(([letter, dka]) => _htmlTable(dka, letter)).join('</br>')}
+  ${Object.values(FSMs).map(fsm => _htmlTable(fsm).join('</br>'))}
 </body></html>`;
 
   const _save = (toPath, data) => {
@@ -79,13 +79,18 @@ module.exports = (() => {
       if (err) {
         return console.log(err);
       }
-      console.log(`Wrote ${toPath}.`);
+      console.log(`Wrote ${toPath}`);
     });
   };
 
   const save = (savePath, fsms) => {
     _save(`${savePath}.json`, JSON.stringify(fsms));
-    _save(`${savePath}.html`, _makeHTML(fsms));
+
+    try {
+      _save(`${savePath}.html`, _makeHTML(fsms));
+    } catch (e) {
+      console.log("Couldn't write HTML representation.");
+    }
 
     return fsms;
   };

@@ -9,11 +9,11 @@ module.exports = (() => {
   //   nfa: 'NFA',
   // };
 
-  const empty = () => ({
+  const emptyMachine = () => ({
     states: [],
     alphabet: [],
     acceptingStates: [],
-    initialState: undefined,
+    initialState: '',
     transitions: [],
   });
 
@@ -134,5 +134,5 @@ module.exports = (() => {
   const forAlphabet = (alphabet, numSymbols, numStates) => Array.from(alphabet).reduce((acc, letter) => ({ [letter]: forLetter(letter, numSymbols, numStates), ...acc }), {});
 
 
-  return { empty, forLetter, forAlphabet };
+  return { emptyMachine, forLetter, forAlphabet };
 })();
