@@ -74,7 +74,7 @@ module.exports = (() => {
   };
 
   const _makeHTML = FSMs => `<!DOCTYPE html><html><head></head><body>
-  ${Object.values(FSMs).map(fsm => _htmlTable(fsm).join('</br>'))}
+  ${Object.values(FSMs).map(fsm => _htmlTable(fsm)).join('</br>')}
 </body></html>`;
 
   const _save = (toPath, data) => {
@@ -89,11 +89,11 @@ module.exports = (() => {
   const save = (savePath, fsms) => {
     _save(`${savePath}.json`, JSON.stringify(fsms));
 
-    try {
+    // try {
       _save(`${savePath}.html`, _makeHTML(fsms));
-    } catch (e) {
-      console.log("Couldn't write HTML representation.");
-    }
+    // } catch (e) {
+    //   console.log("Couldn't write HTML representation.");
+    // }
 
     return fsms;
   };
