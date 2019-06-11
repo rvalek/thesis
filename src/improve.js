@@ -15,7 +15,7 @@ module.exports = (() => {
       return counter;
     }, 0);
 
-    const isBalanced = word => Math.abs(_imbalanceCount(word)) <= tolerance;
+  const isBalanced = word => Math.abs(_imbalanceCount(word)) <= tolerance;
 
   return { isBalanced };
 })();

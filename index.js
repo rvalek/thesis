@@ -7,7 +7,7 @@ const machines = require('./src/machines');
 
 
 (() => {
-  const input = cli.input || 'accba';
+  const input = cli.input || 'aaccba';
   io.validateInput(input);
 
 

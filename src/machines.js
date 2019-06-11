@@ -94,17 +94,16 @@ module.exports = (() => {
     return newFsm;
   };
 
-  const _allAcceptingCells = new Set();
+  const _allAcceptingCellSymbols = new Set();
   const _randomUniqueCell = (dka) => {
     const symbol = util.getRandomElement(dka.alphabet);
     const state = util.getRandomElement(dka.states);
-    const asText = `${symbol}:${state}`;
 
-    if (_allAcceptingCells.has(asText)) return _randomUniqueCell(dka);
+    if (_allAcceptingCellSymbols.has(symbol)) return _randomUniqueCell(dka);
 
-    _allAcceptingCells.add(asText);
+    _allAcceptingCellSymbols.add(symbol);
 
-    return { symbol, state, asText };
+    return { symbol, state };
   };
 
   const _findTransitionIndex = (dka, state, symbol) => parseInt(state.slice(1), 10) * dka.alphabet.length
