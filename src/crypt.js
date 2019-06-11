@@ -1,5 +1,6 @@
 const words = require('./words');
 const config = require('../config');
+const improve = require('./improve');
 
 module.exports = (FSMs) => {
   const _acceptsWord = word => DKA => words.isAccepted(DKA, word);
@@ -15,23 +16,27 @@ module.exports = (FSMs) => {
     }
 
     for (
-      let suffixLength = minSuffixLength, acceptingDKA;
+      let suffixLength = minSuffixLength, acceptingDKA, word;
       suffixLength >= -subCipher.length;
       suffixLength -= 1
     ) {
-      acceptingDKA = possibleDKAs.find(
-        _acceptsWord(subCipher.slice(suffixLength)),
-      );
+      word = subCipher.slice(suffixLength);
+      if (improve.isBalanced(word)) {
+        acceptingDKA = possibleDKAs.find(_acceptsWord(word));
 
-      if (acceptingDKA !== undefined) {
-        return { decipheredLetter: acceptingDKA.ciphersLetter, suffixLength };
+        if (acceptingDKA !== undefined) {
+          return { decipheredLetter: acceptingDKA.ciphersLetter, suffixLength };
+        }
       }
     }
 
     return null;
   };
 
-  const decrypt = (cipher, minLengthPerLetter = config.minCypherLengthPerSourceLetter) => {
+  const decrypt = (
+    cipher,
+    minLengthPerLetter = config.minCypherLengthPerSourceLetter,
+  ) => {
     let unparsed = cipher;
     let deciphered = '';
     let suffixLength = -minLengthPerLetter;
@@ -58,7 +63,9 @@ module.exports = (FSMs) => {
     if (config.logging) {
       console.log(
         `Decryption successful. Steps:\n${continuationPoints
-          .map(([remainingCipher, alreadyDeciphered]) => `${remainingCipher} | ${alreadyDeciphered}`)
+          .map(
+            ([remainingCipher, alreadyDeciphered]) => `${remainingCipher} | ${alreadyDeciphered}`,
+          )
           .join('\t\n')}`,
       );
     }
@@ -67,9 +74,7 @@ module.exports = (FSMs) => {
   };
 
   // Produces a cipher string for a given source string.
-  const encrypt = sourceText => Array.from(sourceText)
-      .map(letter => words.generate(FSMs[letter]))
-      .join('');
+  const encrypt = ([...sourceText]) => sourceText.map(letter => words.generate(FSMs[letter])).join('');
 
   return {
     encrypt,

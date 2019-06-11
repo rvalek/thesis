@@ -1,5 +1,6 @@
 const config = require('../config');
 const util = require('./util');
+const improve = require('./improve');
 
 module.exports = (() => {
   // Produces a set of target states from given states and a symbol.
@@ -36,11 +37,26 @@ module.exports = (() => {
     const word = trail.reverse().join('');
 
     if (config.logging) {
-      console.log(`Ciphered ${fsm.ciphersLetter} as ${word}`);
+      console.log(`Generated ${fsm.ciphersLetter} for ${word}`);
     }
 
     return word;
   };
+
+  // _generateSingle that is balanced
+    const _generateBalanced = (fsm, minLength = 1) => {
+      let word = _generateSingle(fsm, minLength);
+
+      while (!improve.isBalanced(word)) {
+        word = _generateSingle(fsm, minLength);
+      }
+
+      if (config.logging) {
+        console.log(`Generated balanced ${fsm.ciphersLetter} for ${word}`);
+      }
+
+      return word;
+    };
 
   // Produces requested number of random string, accepted by a given machine.
   const generate = (
@@ -48,10 +64,10 @@ module.exports = (() => {
     num = 1,
     minLength = config.minCypherLengthPerSourceLetter,
   ) => (num === 1
-      ? _generateSingle(fsm, minLength)
+      ? _generateBalanced(fsm, minLength)
       : Array(num)
           .fill()
-          .map(() => _generateSingle(fsm, minLength)));
+          .map(() => _generateBalanced(fsm, minLength)));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));
