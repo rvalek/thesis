@@ -6,8 +6,11 @@ const util = require('./util');
 module.exports = (FSMs) => {
   const evenCheckLetter = 'a';
   const oddCheckLetter = 'b';
-  const _generateParityCipher = sourceText => words.generate(FSMs[util.ofEvenLength(sourceText) ? evenCheckLetter : oddCheckLetter]);
-  const _checkDecryptedParity = decryptedText => (decryptedText.length - 1) % 2 === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
+  const _generateParityCipher = sourceText => words.generate(
+      FSMs[util.ofEvenLength(sourceText) ? evenCheckLetter : oddCheckLetter],
+    );
+  const _checkDecryptedParity = decryptedText => (decryptedText.length - 1) % 2
+    === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
   const _acceptsWord = word => DKA => words.isAccepted(DKA, word);
   const _dkasWithTeminatingSymbol = letter => Object.values(FSMs).filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
@@ -52,7 +55,9 @@ module.exports = (FSMs) => {
 
     for (;;) {
       if (unparsed.length === 0) {
-        if (_checkDecryptedParity(deciphered)) { break; }
+        if (_checkDecryptedParity(deciphered)) {
+          break;
+        }
       }
 
       found = _decipherSuffix(unparsed, suffixLength);
@@ -79,7 +84,6 @@ module.exports = (FSMs) => {
           .join('\t\n')}`,
       );
     }
-
 
     // removing parity letter from deciphered text
     return deciphered.slice(0, deciphered.length - 1);
