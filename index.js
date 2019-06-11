@@ -1,19 +1,25 @@
 
 const crypt = require('./src/crypt');
-const io = require('./src/io');
 const config = require('./config');
 const cli = require('./cli');
 const machines = require('./src/machines');
+const util = require('./src/util');
 
 
 (() => {
-  const input = cli.input || 'aaccba';
-  io.validateInput(input);
+  const input = cli.input || 'accba';
+  util.validateInput(input);
 
+  let keys;
+  if (cli.new) {
+    keys = machines.generate(config.sourceAlphabet);
+    util.writeJSON(config.fsmSavePath, keys);
+    util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
+  } else {
+    keys = util.readJSON(config.fsmSavePath);
+  }
 
-  const system = crypt(cli.new
-    ? io.save(config.fsmSavePath, machines.generate(config.sourceAlphabet))
-    : io.read(config.fsmSavePath));
+  const system = crypt(keys);
 
   const encrypted = system.encrypt(input);
   const decrypted = system.decrypt(encrypted);
