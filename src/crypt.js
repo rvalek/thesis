@@ -12,29 +12,29 @@ module.exports = (FSMs) => {
   const _checkDecryptedParity = decryptedText => (decryptedText.length - 1) % 2
     === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
-  const _acceptsWord = word => DKA => words.isAccepted(DKA, word);
-  const _dkasWithTeminatingSymbol = letter => Object.values(FSMs).filter(dka => dka.acceptingCells.some(cell => cell.symbol === letter));
+  const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
+  const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
-    const possibleDKAs = _dkasWithTeminatingSymbol(
+    const possibleFSMs = _fsmsWithTeminatingSymbol(
       subCipher[subCipher.length - 1],
     );
 
-    if (!possibleDKAs) {
+    if (!possibleFSMs) {
       return null;
     }
 
     for (
-      let suffixLength = minSuffixLength, acceptingDKA, word;
+      let suffixLength = minSuffixLength, acceptingFSM, word;
       suffixLength >= -subCipher.length;
       suffixLength -= 1
     ) {
       word = subCipher.slice(suffixLength);
       if (improve.isBalanced(word)) {
-        acceptingDKA = possibleDKAs.find(_acceptsWord(word));
+        acceptingFSM = possibleFSMs.find(_acceptsWord(word));
 
-        if (acceptingDKA !== undefined) {
-          return { decipheredLetter: acceptingDKA.ciphersLetter, suffixLength };
+        if (acceptingFSM !== undefined) {
+          return { decipheredLetter: acceptingFSM.ciphersLetter, suffixLength };
         }
       }
     }
@@ -42,6 +42,7 @@ module.exports = (FSMs) => {
     return null;
   };
 
+  // Attempts to recover source text from a given cipher.
   const decrypt = (
     cipher,
     minLengthPerLetter = config.minCypherLengthPerSourceLetter,
