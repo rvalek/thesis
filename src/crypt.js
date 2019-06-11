@@ -3,6 +3,8 @@ const config = require('../config');
 const improve = require('./improve');
 const util = require('./util');
 
+// TODO: add full logging to decryption process
+
 module.exports = (FSMs) => {
   const evenCheckLetter = 'a';
   const oddCheckLetter = 'b';

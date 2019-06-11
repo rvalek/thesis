@@ -1,14 +1,16 @@
 const util = require('../src/util');
 const config = require('../config');
 
+// TODO: add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
+
 module.exports = (() => {
   // Produces an FSM object with given properties and randomly generated transitions.
   const _createRandom = (numStates, numAlphabet, maxNumToStates = 1) => {
     const newFsm = {};
 
     newFsm.alphabet = numAlphabet <= 26
-    ? [...util.latinAlphabet.substr(0, numAlphabet)]
-    : util.generateArray((_, i) => `a${i}`, numAlphabet);
+        ? [...util.latinAlphabet.substr(0, numAlphabet)]
+        : util.generateArray((_, i) => `a${i}`, numAlphabet);
 
     newFsm.states = util.generateArray((_, i) => `s${i}`, numStates);
     [newFsm.initialState] = newFsm.states;
@@ -21,6 +23,15 @@ module.exports = (() => {
         const numToStates = Math.ceil(Math.random() * maxNumToStates);
 
         if (numToStates > 0) {
+          // const _someMath = (_, i) => {
+          //   let diff = newFsm.states.length - i - (numToStates - toStates.length) + 1;
+          //   diff = diff <= 0 ? 1 : 1 / diff;
+
+          //   if (Math.random() <= diff) {
+          //     return newFsm.states[i];
+          //   }
+          // };
+          // const toStates = util.generateArray(_someMath, Math.max(numToStates, newFsm.states.length)).filter(e => e !== undefined);
           const toStates = [];
           for (
             let k = 0;
@@ -28,12 +39,7 @@ module.exports = (() => {
             k += 1
           ) {
             let diff = newFsm.states.length - k - (numToStates - toStates.length) + 1;
-
-            if (diff <= 0) {
-              diff = 1;
-            } else {
-              diff = 1 / diff;
-            }
+            diff = diff <= 0 ? 1 : 1 / diff;
 
             if (Math.random() <= diff) {
               toStates.push(newFsm.states[k]);
@@ -48,12 +54,6 @@ module.exports = (() => {
         }
       }
     }
-
-    // yo?
-    // if (maxNumToStates > 1) {
-    //   newFsm = noam.fsm.convertNfaToDfa(newFsm);
-    //   newFsm = noam.fsm.minimize(newFsm);
-    // }
 
     return newFsm;
   };
