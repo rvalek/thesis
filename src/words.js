@@ -7,7 +7,7 @@ module.exports = (() => {
   const _makeTransition = (fsm, fromStates, symbol) => new Set(
       fsm.transitions
         .filter(t => t.symbol === symbol && fromStates.includes(t.fromState))
-        .reduce((accStates, t) => [...accStates, ...t.toStates], []),
+        .flatMap(t => t.toStates),
     );
 
   // Produces the resulting state of a given machine after reading a string.
@@ -65,9 +65,7 @@ module.exports = (() => {
     minLength = config.minCypherLengthPerSourceLetter,
   ) => (num === 1
       ? _generateBalanced(fsm, minLength)
-      : Array(num)
-          .fill()
-          .map(() => _generateBalanced(fsm, minLength)));
+      : util.generateArray(() => _generateBalanced(fsm, minLength), num));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));

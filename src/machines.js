@@ -2,54 +2,18 @@ const util = require('../src/util');
 const config = require('../config');
 
 module.exports = (() => {
-  const _latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
-
-  // const fsmTypes = {
-  //   dfa: 'DFA',
-  //   nfa: 'NFA',
-  // };
-
-  // generate random fsm
-  const _createRandomFsm = (numStates, numAlphabet, maxNumToStates = 1) => {
+  // Produces an FSM object with given properties and randomly generated transitions.
+  const _createRandom = (numStates, numAlphabet, maxNumToStates = 1) => {
     const newFsm = {};
 
-    function prefix(ch, num, str) {
-      let retStr = str;
+    newFsm.alphabet = numAlphabet <= 26
+    ? [...util.latinAlphabet.substr(0, numAlphabet)]
+    : util.generateArray((_, i) => `a${i}`, numAlphabet);
 
-      for (let i = 0; i < str.length - num; i += 1) {
-        retStr = ch + str;
-      }
-
-      return retStr;
-    }
-
-    newFsm.states = [];
-    for (let i = 0, len = numStates.toString().length; i < numStates; i += 1) {
-      newFsm.states.push(`s${prefix('0', len, i.toString())}`);
-    }
-
-    newFsm.alphabet = [];
-
-    if (numAlphabet > 26) {
-      for (
-        let i = 0, len = numAlphabet.toString().length;
-        i < numAlphabet;
-        i += 1
-      ) {
-        newFsm.alphabet.push(`a${prefix('0', len, i.toString())}`);
-      }
-    } else {
-      newFsm.alphabet = _latinAlphabet.substr(0, numAlphabet).split('');
-    }
-
+    newFsm.states = util.generateArray((_, i) => `s${i}`, numStates);
     [newFsm.initialState] = newFsm.states;
 
-    newFsm.acceptingStates = [];
-    for (let i = 0; i < numStates; i += 1) {
-      if (Math.round(Math.random())) {
-        newFsm.acceptingStates.push(newFsm.states[i]);
-      }
-    }
+    newFsm.acceptingStates = newFsm.states.filter(() => Math.round(Math.random()));
 
     newFsm.transitions = [];
     for (let i = 0; i < numStates; i += 1) {
@@ -118,7 +82,7 @@ module.exports = (() => {
   });
 
   const _generateSingle = (letter, alphabetSize, operationalStates) => {
-    const newDka = _createRandomFsm(operationalStates, alphabetSize);
+    const newDka = _createRandom(operationalStates, alphabetSize);
     newDka.ciphersLetter = letter;
 
     // Chooses a cell that would point to the accepting state
@@ -215,7 +179,9 @@ module.exports = (() => {
     return htmlString.join('\n');
   };
 
-  const toHtml = FSMs => Object.values(FSMs).map(_makeHtmlTable).join('</br>');
+  const toHtml = FSMs => Object.values(FSMs)
+      .map(_makeHtmlTable)
+      .join('</br>');
 
   const generate = (
     letters = '',

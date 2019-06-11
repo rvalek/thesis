@@ -2,6 +2,8 @@ const { writeFile, readFileSync } = require('fs');
 const config = require('../config');
 
 module.exports = (() => {
+  const latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
+
   // Produces random element of a given array.
   const getRandomElement = arr => (arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : null);
 
@@ -33,6 +35,8 @@ module.exports = (() => {
     );
   };
 
+  const generateArray = (producer, length) => Array(length).fill().map(producer);
+
   return {
     getRandomElement,
     ofEvenLength,
@@ -40,5 +44,7 @@ module.exports = (() => {
     writeJSON,
     writeHTML,
     validateInput,
+    latinAlphabet,
+    generateArray,
   };
 })();
