@@ -223,7 +223,7 @@ module.exports = (() => {
     numStates = config.fsmNumStates,
   ) => (letters.length === 0
       ? _generateSingle(letters, numSymbols, numStates)
-      : Array.from(letters).reduce(
+      : [...letters].reduce(
           (acc, letter) => ({
             [letter]: _generateSingle(letter, numSymbols, numStates),
             ...acc,

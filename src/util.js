@@ -10,7 +10,7 @@ module.exports = (() => {
 
   // Validates provided source text against supported encryption alphabet.
   const validateInput = (word) => {
-    if (!Array.from(word).every(char => config.sourceAlphabet.includes(char))) {
+    if (![...word].every(char => config.sourceAlphabet.includes(char))) {
       throw Error(`Input alphabet is limited to: ${config.sourceAlphabet}`);
     }
     return word;

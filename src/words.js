@@ -11,8 +11,8 @@ module.exports = (() => {
     );
 
   // Produces the resulting state of a given machine after reading a string.
-  const _readString = (fsm, inputString) => Array.from(inputString).reduce(
-      (accStates, symbol) => Array.from(_makeTransition(fsm, accStates, symbol)),
+  const _readString = (fsm, [...inputString]) => inputString.reduce(
+      (accStates, symbol) => [..._makeTransition(fsm, accStates, symbol)],
       [fsm.initialState],
     );
 
@@ -44,19 +44,19 @@ module.exports = (() => {
   };
 
   // _generateSingle that is balanced
-    const _generateBalanced = (fsm, minLength = 1) => {
-      let word = _generateSingle(fsm, minLength);
+  const _generateBalanced = (fsm, minLength = 1) => {
+    let word = _generateSingle(fsm, minLength);
 
-      while (!improve.isBalanced(word)) {
-        word = _generateSingle(fsm, minLength);
-      }
+    while (!improve.isBalanced(word)) {
+      word = _generateSingle(fsm, minLength);
+    }
 
-      if (config.logging) {
-        console.log(`Generated balanced ${fsm.ciphersLetter} for ${word}`);
-      }
+    if (config.logging) {
+      console.log(`Generated balanced ${fsm.ciphersLetter} for ${word}`);
+    }
 
-      return word;
-    };
+    return word;
+  };
 
   // Produces requested number of random string, accepted by a given machine.
   const generate = (
