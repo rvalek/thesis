@@ -37,7 +37,7 @@ module.exports = (() => {
     const word = trail.reverse().join('');
 
     if (config.logging) {
-      console.log(`Generated ${fsm.ciphersLetter} for ${word}`);
+      console.log(`Generated ${word} for ${fsm.ciphersLetter}`);
     }
 
     return word;
@@ -52,7 +52,7 @@ module.exports = (() => {
     }
 
     if (config.logging) {
-      console.log(`Generated balanced ${fsm.ciphersLetter} for ${word}`);
+      console.log(`Generated balanced ${word} for ${fsm.ciphersLetter}`);
     }
 
     return word;
