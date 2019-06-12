@@ -41,7 +41,7 @@ const util = require('./src/util');
     console.log(`Source text: ${input}`);
     console.log(`Encrypted text: ${encrypted}`);
 
-    util.matchesAlphabet(input, config.fsmAlphabet);
+    util.matchesAlphabet(encrypted, config.fsmAlphabet);
     const decrypted = system.decrypt(encrypted);
     console.log(`Decrypted text: ${decrypted}`);
   }

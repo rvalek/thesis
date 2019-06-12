@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,8 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "commander": "^2.20.0",
-    "string-similarity": "^3.0.0",
-    "structure.js": "0.0.2"
+    "string-similarity": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^5.14.1",
