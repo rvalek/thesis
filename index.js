@@ -15,7 +15,7 @@ const util = require('./src/util');
   } else {
     keys = util.readJSON(config.fsmSavePath);
     util.matchesAlphabet(Object.keys(keys), config.sourceAlphabet);
-    util.matchesAlphabet(keys.a.alphabet, config.fsmAlphabet);
+    util.matchesAlphabet(keys[config.sourceAlphabet[0]].alphabet, config.fsmAlphabet);
   }
 
   const system = crypt(keys);

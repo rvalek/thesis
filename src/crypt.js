@@ -6,8 +6,9 @@ const util = require('./util');
 // TODO: add full logging to decryption process
 
 module.exports = (FSMs) => {
-  const evenCheckLetter = 'a';
-  const oddCheckLetter = 'b';
+  const evenCheckLetter = config.sourceAlphabet[0];
+  const oddCheckLetter = config.sourceAlphabet[1];
+
   const _generateParityCipher = sourceText => words.generate(
       FSMs[util.ofEvenLength(sourceText) ? evenCheckLetter : oddCheckLetter],
     );
