@@ -98,7 +98,7 @@ module.exports = (() => {
   };
 
   const _makeHtmlTable = (fsm) => {
-    const headers = [`<i>${fsm.ciphersLetter}</i>`].concat(fsm.alphabet);
+    const headers = [`<i>'${fsm.ciphersLetter}'</i>`].concat(fsm.alphabet);
 
     headers.push('');
 
