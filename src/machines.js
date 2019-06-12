@@ -4,18 +4,22 @@ const config = require('../config');
 // TODO: add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
 
 module.exports = (() => {
+  const _baseFsm = (alphabet = [], states = []) => ({
+    alphabet,
+    states,
+    acceptingStates: states.filter(() => Math.round(Math.random())),
+    initialState: states.length > 0 ? states[0] : '',
+    transitions: [],
+  });
+
   // Produces an FSM object with given properties and randomly generated transitions.
-  const _createRandom = (numStates, alphabet, maxNumToStates = 1) => {
-    const newFsm = {};
+  const _createRandom = (alphabet, numStates, maxNumToStates = 1) => {
+    const newFsm = _baseFsm(
+      alphabet,
+      util.generateArray((_, i) => `s${i}`, numStates),
+    );
 
-    newFsm.alphabet = alphabet;
-
-    newFsm.states = util.generateArray((_, i) => `s${i}`, numStates);
-    [newFsm.initialState] = newFsm.states;
-
-    newFsm.acceptingStates = newFsm.states.filter(() => Math.round(Math.random()));
-
-    newFsm.transitions = [];
+    // Generate random but valid set of transitions
     for (let i = 0; i < numStates; i += 1) {
       for (let j = 0; j < newFsm.alphabet.length; j += 1) {
         const numToStates = Math.ceil(Math.random() * maxNumToStates);
@@ -68,25 +72,16 @@ module.exports = (() => {
     return { symbol, state };
   };
 
-  const _findTransitionIndex = (dka, state, symbol) => parseInt(state.slice(1), 10) * dka.alphabet.length
-    + dka.alphabet.indexOf(symbol);
-
-  const emptyMachine = () => ({
-    states: [],
-    alphabet: [],
-    acceptingStates: [],
-    initialState: '',
-    transitions: [],
-  });
+  const _findTransitionIndex = (fsm, { state, symbol }) => parseInt(state.slice(1), 10) * fsm.alphabet.length
+    + fsm.alphabet.indexOf(symbol);
 
   const _generateSingle = (letter, alphabet, operationalStates) => {
-    const newDka = _createRandom(operationalStates, alphabet);
+    const newDka = _createRandom(alphabet, operationalStates);
     newDka.ciphersLetter = letter;
 
     // Chooses a cell that would point to the accepting state
     // Makes sure it wasn't chosen in any other dka
     const acceptingCell = _randomUniqueCell(newDka);
-    // ...ehhh...
     newDka.acceptingCells = [acceptingCell];
 
     // Adds a state and makes it the only accepting one
@@ -96,11 +91,7 @@ module.exports = (() => {
 
     // Determines the transition from the chosen accepting cell
     // Points it to the accepting state
-    const acceptingTransition = _findTransitionIndex(
-      newDka,
-      acceptingCell.state,
-      acceptingCell.symbol,
-    );
+    const acceptingTransition = _findTransitionIndex(newDka, acceptingCell);
     newDka.transitions[acceptingTransition].toStates = [newStateName];
 
     return newDka;
@@ -114,7 +105,7 @@ module.exports = (() => {
     const tableRows = [];
 
     for (let i = 0; i < fsm.states.length; i += 1) {
-      tableRows.push(new Array(headers.length));
+      tableRows.push(Array(headers.length));
       for (let j = 0; j < headers.length; j += 1) {
         tableRows[i][j] = { text: [] };
       }
@@ -146,7 +137,7 @@ module.exports = (() => {
         }
       }
 
-      if (typeof tableRows[rowNum][colNum].text === 'undefined') {
+      if (tableRows[rowNum][colNum].text === undefined) {
         tableRows[rowNum][colNum] = { text: [] };
       }
 
@@ -181,11 +172,7 @@ module.exports = (() => {
       .map(_makeHtmlTable)
       .join('</br>');
 
-  const generate = (
-    letters = '',
-    alphabet = config.fsmAlphabet,
-    numStates = config.fsmStates,
-  ) => (letters.length === 0
+  const generate = (letters = '', [...alphabet] = [], numStates = 0) => (letters.length === 0
       ? _generateSingle(letters, alphabet, numStates)
       : [...letters].reduce(
           (acc, letter) => ({
@@ -195,5 +182,5 @@ module.exports = (() => {
           {},
         ));
 
-  return { emptyMachine, generate, toHtml };
+  return { generate, toHtml };
 })();

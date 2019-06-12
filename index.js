@@ -9,11 +9,13 @@ const util = require('./src/util');
 (() => {
   let keys;
   if (cli.new) {
-    keys = machines.generate(config.sourceAlphabet);
+    keys = machines.generate(config.sourceAlphabet, config.fsmAlphabet, config.fsmStates);
     util.writeJSON(config.fsmSavePath, keys);
     util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
   } else {
     keys = util.readJSON(config.fsmSavePath);
+    util.matchesAlphabet(Object.keys(keys), config.sourceAlphabet);
+    util.matchesAlphabet(keys.a.alphabet, config.fsmAlphabet);
   }
 
   const system = crypt(keys);
@@ -22,16 +24,14 @@ const util = require('./src/util');
     const input = cli.encrypt;
     util.matchesAlphabet(input, config.sourceAlphabet);
     const encrypted = system.encrypt(input);
-    console.log(`Source text: ${input}`);
-    console.log(`Encrypted text: ${encrypted}`);
+    console.log(encrypted);
   }
 
   if (cli.decrypt) {
     const input = cli.decrypt;
     util.matchesAlphabet(input, config.fsmAlphabet);
     const decrypted = system.decrypt(input);
-    console.log(`Cipher: ${input}`);
-    console.log(`Decrypted text: ${decrypted}`);
+    console.log(decrypted);
   }
 
   if (cli.test) {
@@ -41,7 +41,7 @@ const util = require('./src/util');
     console.log(`Source text: ${input}`);
     console.log(`Encrypted text: ${encrypted}`);
 
-    util.matchesAlphabet(encrypted, config.fsmAlphabet);
+    util.matchesAlphabet(input, config.fsmAlphabet);
     const decrypted = system.decrypt(encrypted);
     console.log(`Decrypted text: ${decrypted}`);
   }

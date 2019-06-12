@@ -20,7 +20,7 @@ module.exports = (() => {
 
   const _save = (toPath, data) => {
     writeFile(toPath, data, (err) => {
-      console.log(err || `Wrote ${toPath}`);
+      if (config.logging) { console.log(err || `Wrote ${toPath}`); }
     });
   };
 

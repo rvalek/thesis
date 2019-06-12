@@ -1,8 +1,10 @@
+const cli = require('./cli');
+
 module.exports = {
-  sourceAlphabet: 'abcde',
-  fsmAlphabet: 'abcabcdefghijklmnopqrstuvwxyzde',
+  sourceAlphabet: 'abcdef',
+  fsmAlphabet: 'abcdefghijklmnopqrstuvwxyz',
   fsmStates: 4,
   minCypherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/FSMs',
-  logging: true,
+  logging: cli.test !== undefined,
 };
