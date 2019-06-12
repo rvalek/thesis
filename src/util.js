@@ -11,9 +11,9 @@ module.exports = (() => {
   const ofEvenLength = e => e.length % 2 === 0;
 
   // Validates provided source text against supported encryption alphabet.
-  const validateInput = (word) => {
-    if (![...word].every(char => config.sourceAlphabet.includes(char))) {
-      throw Error(`Input alphabet is limited to: ${config.sourceAlphabet}`);
+  const matchesAlphabet = (word, alphabet) => {
+    if (![...word].every(char => alphabet.includes(char))) {
+      throw Error(`Word "${word}" does not match alphabet: ${alphabet}`);
     }
     return word;
   };
@@ -43,7 +43,7 @@ module.exports = (() => {
     readJSON,
     writeJSON,
     writeHTML,
-    validateInput,
+    matchesAlphabet,
     latinAlphabet,
     generateArray,
   };

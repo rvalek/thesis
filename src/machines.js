@@ -5,12 +5,10 @@ const config = require('../config');
 
 module.exports = (() => {
   // Produces an FSM object with given properties and randomly generated transitions.
-  const _createRandom = (numStates, numAlphabet, maxNumToStates = 1) => {
+  const _createRandom = (numStates, alphabet, maxNumToStates = 1) => {
     const newFsm = {};
 
-    newFsm.alphabet = numAlphabet <= 26
-        ? [...util.latinAlphabet.substr(0, numAlphabet)]
-        : util.generateArray((_, i) => `a${i}`, numAlphabet);
+    newFsm.alphabet = alphabet;
 
     newFsm.states = util.generateArray((_, i) => `s${i}`, numStates);
     [newFsm.initialState] = newFsm.states;
@@ -81,8 +79,8 @@ module.exports = (() => {
     transitions: [],
   });
 
-  const _generateSingle = (letter, alphabetSize, operationalStates) => {
-    const newDka = _createRandom(operationalStates, alphabetSize);
+  const _generateSingle = (letter, alphabet, operationalStates) => {
+    const newDka = _createRandom(operationalStates, alphabet);
     newDka.ciphersLetter = letter;
 
     // Chooses a cell that would point to the accepting state
@@ -185,13 +183,13 @@ module.exports = (() => {
 
   const generate = (
     letters = '',
-    numSymbols = config.fsmNumSymbols,
-    numStates = config.fsmNumStates,
+    alphabet = config.fsmAlphabet,
+    numStates = config.fsmStates,
   ) => (letters.length === 0
-      ? _generateSingle(letters, numSymbols, numStates)
+      ? _generateSingle(letters, alphabet, numStates)
       : [...letters].reduce(
           (acc, letter) => ({
-            [letter]: _generateSingle(letter, numSymbols, numStates),
+            [letter]: _generateSingle(letter, alphabet, numStates),
             ...acc,
           }),
           {},

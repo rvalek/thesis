@@ -7,9 +7,6 @@ const util = require('./src/util');
 
 
 (() => {
-  const input = cli.input || 'accba';
-  util.validateInput(input);
-
   let keys;
   if (cli.new) {
     keys = machines.generate(config.sourceAlphabet);
@@ -21,10 +18,31 @@ const util = require('./src/util');
 
   const system = crypt(keys);
 
-  const encrypted = system.encrypt(input);
-  const decrypted = system.decrypt(encrypted);
+  if (cli.encrypt) {
+    const input = cli.encrypt;
+    util.matchesAlphabet(input, config.sourceAlphabet);
+    const encrypted = system.encrypt(input);
+    console.log(`Source text: ${input}`);
+    console.log(`Encrypted text: ${encrypted}`);
+  }
 
-  console.log(`Secret text: ${input}`);
-  console.log(`Encrypted text: ${encrypted}`);
-  console.log(`Decrypted text: ${decrypted}`);
+  if (cli.decrypt) {
+    const input = cli.decrypt;
+    util.matchesAlphabet(input, config.fsmAlphabet);
+    const decrypted = system.decrypt(input);
+    console.log(`Cipher: ${input}`);
+    console.log(`Decrypted text: ${decrypted}`);
+  }
+
+  if (cli.test) {
+    const input = cli.test;
+    util.matchesAlphabet(input, config.sourceAlphabet);
+    const encrypted = system.encrypt(input);
+    console.log(`Source text: ${input}`);
+    console.log(`Encrypted text: ${encrypted}`);
+
+    util.matchesAlphabet(encrypted, config.fsmAlphabet);
+    const decrypted = system.decrypt(encrypted);
+    console.log(`Decrypted text: ${decrypted}`);
+  }
 })();

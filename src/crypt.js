@@ -96,8 +96,11 @@ module.exports = (FSMs) => {
   const encrypt = ([...sourceText]) => sourceText.map(letter => words.generate(FSMs[letter])).join('')
     + _generateParityCipher(sourceText);
 
+  const getKeys = () => FSMs;
+
   return {
     encrypt,
     decrypt,
+    getKeys,
   };
 };
