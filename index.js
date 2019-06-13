@@ -1,23 +1,27 @@
-
+/* eslint-disable no-console */
 const crypt = require('./src/crypt');
 const config = require('./config');
 const cli = require('./cli');
 const machines = require('./src/machines');
 const util = require('./src/util');
 
-
-(() => {
-  // console.log(config.sourceAlphabet);
-
+const go = () => {
   let keys;
-  if (cli.new) {
-    keys = machines.generate(config.sourceAlphabet, config.fsmAlphabet, config.fsmStates);
+  if (cli.newKeys) {
+    keys = machines.generate(
+      config.sourceAlphabet,
+      config.fsmAlphabet,
+      config.fsmStates,
+    );
     util.writeJSON(config.fsmSavePath, keys);
     util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
   } else {
     keys = util.readJSON(config.fsmSavePath);
     util.matchesAlphabet(Object.keys(keys), config.sourceAlphabet);
-    util.matchesAlphabet(keys[config.sourceAlphabet[0]].alphabet, config.fsmAlphabet);
+    util.matchesAlphabet(
+      keys[config.sourceAlphabet[0]].alphabet,
+      config.fsmAlphabet,
+    );
   }
 
   const system = crypt(keys);
@@ -46,5 +50,14 @@ const util = require('./src/util');
     util.matchesAlphabet(encrypted, config.fsmAlphabet);
     const decrypted = system.decrypt(encrypted);
     console.log(`Decrypted text: ${decrypted}`);
+  }
+};
+
+(() => {
+  try {
+    go();
+  } catch (e) {
+    console.log('Invalid usage. Details:\n');
+    console.log(e);
   }
 })();
