@@ -52,7 +52,7 @@ module.exports = (() => {
     }
 
     if (config.logging) {
-      console.log(`Generated balanced ${word} for ${fsm.ciphersLetter}`);
+      console.log(`Accepted balanced ${word} for ${fsm.ciphersLetter}`);
     }
 
     return word;

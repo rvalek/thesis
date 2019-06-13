@@ -7,6 +7,8 @@ const util = require('./src/util');
 
 
 (() => {
+  // console.log(config.sourceAlphabet);
+
   let keys;
   if (cli.new) {
     keys = machines.generate(config.sourceAlphabet, config.fsmAlphabet, config.fsmStates);
