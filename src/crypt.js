@@ -19,6 +19,8 @@ module.exports = (FSMs) => {
   const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
+    if (subCipher.length === 0) { return null; }
+
     const possibleFSMs = _fsmsWithTeminatingSymbol(
       subCipher[subCipher.length - 1],
     );
@@ -93,16 +95,6 @@ module.exports = (FSMs) => {
         }
       }
     }
-
-    // if (config.logging) {
-    //   console.log(
-    //     `Decryption successful. Steps:\n${continuationPoints
-    //       .map(
-    //         ([remainingCipher, alreadyDeciphered]) => `${remainingCipher}| ${alreadyDeciphered}`,
-    //       )
-    //       .join('\t\n')}`,
-    //   );
-    // }
 
     // removing parity letter from deciphered text
     return deciphered.slice(0, deciphered.length - 1);
