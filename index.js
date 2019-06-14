@@ -43,9 +43,9 @@ const go = () => {
   if (cli.test) {
     const input = cli.test;
     util.matchesAlphabet(input, config.sourceAlphabet);
-    const encrypted = system.encrypt(input);
     console.log(`Source text: ${input}`);
-    console.log(`Encrypted text: ${encrypted}`);
+    const encrypted = system.encrypt(input);
+    console.log(`\nEncrypted text: ${encrypted}`);
 
     util.matchesAlphabet(encrypted, config.fsmAlphabet);
     const decrypted = system.decrypt(encrypted);
