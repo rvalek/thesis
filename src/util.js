@@ -47,12 +47,12 @@ module.exports = (() => {
       // eslint-disable-next-line no-param-reassign
       [a[i], a[j]] = [a[j], a[i]];
     }
+
     return a;
   };
 
   const asHalves = ([...a]) => {
     const middleIndex = Math.floor(a.length / 2);
-
     return { left: a.slice(0, middleIndex), right: a.slice(middleIndex) };
   };
 

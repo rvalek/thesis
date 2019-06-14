@@ -64,7 +64,9 @@ module.exports = (() => {
     const symbol = util.getRandomElement(dka.alphabet);
     const state = util.getRandomElement(dka.states);
 
-    if (_allAcceptingCellSymbols.has(symbol)) return _randomUniqueCell(dka);
+    if (_allAcceptingCellSymbols.has(symbol)) {
+      return _randomUniqueCell(dka);
+    }
 
     _allAcceptingCellSymbols.add(symbol);
 
@@ -112,7 +114,9 @@ module.exports = (() => {
 
     const balanceLetters = [
       '<span>',
-      `  <b>Balancing</b> -- <b>Left:</b> ${fsm.balanceLetters.left}; <b>Right:</b> ${fsm.balanceLetters.right};`,
+      `  <b>Balancing</b> -- <b>Left:</b> ${
+        fsm.balanceLetters.left
+      }; <b>Right:</b> ${fsm.balanceLetters.right};`,
       '</span>',
     ];
 
