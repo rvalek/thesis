@@ -53,7 +53,7 @@ module.exports = (() => {
   const asHalves = ([...a]) => {
     const middleIndex = Math.floor(a.length / 2);
 
-    return [a.slice(0, middleIndex), a.slice(middleIndex)];
+    return { left: a.slice(0, middleIndex), right: a.slice(middleIndex) };
   };
 
   return {

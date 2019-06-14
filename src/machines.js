@@ -1,5 +1,4 @@
 const util = require('../src/util');
-const config = require('../config');
 
 // TODO?  add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
 
@@ -111,16 +110,28 @@ module.exports = (() => {
       fsm.acceptingStates.includes(state) ? ['1'] : ['0'],
     ]);
 
-    const htmlString = [
+    const balanceLetters = [
+      '<span>',
+      `  <b>Balancing</b> -- <b>Left:</b> ${fsm.balanceLetters.left}; <b>Right:</b> ${fsm.balanceLetters.right};`,
+      '</span>',
+    ];
+
+    const html = [
       '<table border="1">',
       '  <tr>',
       ...header.map(cell => `    <th>${cell}</th>`),
       '  </tr>',
-      ...tableRows.flatMap(row => ['  <tr>', ...row.map(cell => `    <td>${cell}</td>`), '  </tr>']),
+      ...tableRows.flatMap(row => [
+        '  <tr>',
+        ...row.map(cell => `    <td>${cell}</td>`),
+        '  </tr>',
+      ]),
       '</table>',
+      ...balanceLetters,
+      '</br>',
     ];
 
-    return htmlString.join('\n');
+    return html.join('\n');
   };
 
   const toHtml = FSMs => Object.values(FSMs)
