@@ -23,7 +23,7 @@ module.exports = (FSMs) => {
       subCipher[subCipher.length - 1],
     );
 
-    if (!possibleFSMs) {
+    if (possibleFSMs.length === 0) {
       return null;
     }
 
