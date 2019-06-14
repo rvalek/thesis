@@ -1,6 +1,7 @@
-const util = require('../src/util');
+const util = require('./util');
+const words = require('./words');
 
-// TODO?  add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
+// TODO: sort out _createRandom and maxNumToStates
 
 module.exports = (() => {
   const _baseFsm = (alphabet = [], states = []) => ({
@@ -59,46 +60,41 @@ module.exports = (() => {
     return newFsm;
   };
 
-  const _allAcceptingCellSymbols = new Set();
-  const _randomUniqueCell = (dka) => {
-    const symbol = util.getRandomElement(dka.alphabet);
-    const state = util.getRandomElement(dka.states);
-
-    if (_allAcceptingCellSymbols.has(symbol)) {
-      return _randomUniqueCell(dka);
-    }
-
-    _allAcceptingCellSymbols.add(symbol);
-
-    return { symbol, state };
-  };
-
-  const _findTransitionIndex = (fsm, { state, symbol }) => parseInt(state.slice(1), 10) * fsm.alphabet.length
-    + fsm.alphabet.indexOf(symbol);
-
   const _generateSingle = (letter, alphabet, operationalStates) => {
-    const newDka = _createRandom(alphabet, operationalStates);
-    newDka.ciphersLetter = letter;
+    const newFsm = _createRandom(alphabet, operationalStates);
+    newFsm.ciphersLetter = letter;
+
+    // Randomly drops about half of transitions
+    newFsm.transitions = newFsm.transitions.filter(() => Math.round(Math.random()));
 
     // Chooses a cell that would point to the accepting state
     // Makes sure it wasn't chosen in any other dka
-    const acceptingCell = _randomUniqueCell(newDka);
-    newDka.acceptingCells = [acceptingCell];
+    const randomTransition = util.getRandomElement(newFsm.transitions);
+    const acceptingCell = {
+      state: randomTransition.fromState,
+      symbol: randomTransition.symbol,
+    };
+    newFsm.acceptingCells = [acceptingCell];
 
     // Adds a state and makes it the only accepting one
     const newStateName = 'sX';
-    newDka.states.push(newStateName);
-    newDka.acceptingStates = [newStateName];
+    newFsm.states.push(newStateName);
+    newFsm.acceptingStates = [newStateName];
 
     // Determines the transition from the chosen accepting cell
     // Points it to the accepting state
-    const acceptingTransition = _findTransitionIndex(newDka, acceptingCell);
-    newDka.transitions[acceptingTransition].toStates = [newStateName];
+    newFsm.transitions.find(
+      t => t.fromState === acceptingCell.state && t.symbol === acceptingCell.symbol,
+    ).toStates = [newStateName];
 
     // Adds laft and right letters for balancing
-    newDka.balanceLetters = util.asHalves(util.shuffle(util.latinAlphabet));
+    newFsm.balanceLetters = util.asHalves(util.shuffle(util.latinAlphabet));
 
-    return newDka;
+    if (!words.generate(newFsm)) {
+      console.log('Achtung!');
+      return _generateSingle(letter, alphabet, operationalStates);
+    }
+    return newFsm;
   };
 
   const _makeHtmlTable = (fsm) => {

@@ -68,7 +68,7 @@ module.exports = (() => {
       : util.generateArray(() => _generateBalanced(fsm, minLength), num));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
-  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state));
+  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state)) && balance.check(word, fsm.balanceLetters);
 
   return { generate, isAccepted };
 })();

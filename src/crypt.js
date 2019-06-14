@@ -1,7 +1,8 @@
 const words = require('./words');
 const config = require('../config');
-const balance = require('./balance');
 const util = require('./util');
+
+// TODO: does parity check actually word?
 
 module.exports = (FSMs) => {
   const evenCheckLetter = config.sourceAlphabet[0];
@@ -13,8 +14,7 @@ module.exports = (FSMs) => {
   const _checkDecryptedParity = decryptedText => (decryptedText.length + 1) % 2
     === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
-  const _acceptsWord = word => fsm => words.isAccepted(fsm, word)
-    && balance.check(word, fsm.balanceLetters);
+  const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
 
   const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
