@@ -17,7 +17,8 @@ module.exports = {
     'no-mixed-operators':  'warn',
     'no-underscore-dangle':  'off',
     'consistent-return': 'warn',
-    'max-len': 'warn',
-    'indent': 'off'
+    'max-len': 'off',
+    'indent': 'off',
+    'no-console': 'off'
   },
 };

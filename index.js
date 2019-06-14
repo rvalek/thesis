@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const crypt = require('./src/crypt');
 const config = require('./config');
 const cli = require('./cli');
