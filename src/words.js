@@ -1,6 +1,6 @@
 const config = require('../config');
 const util = require('./util');
-const improve = require('./improve');
+const balance = require('./balance');
 
 module.exports = (() => {
   // Produces a set of target states from given states and a symbol.
@@ -47,12 +47,12 @@ module.exports = (() => {
   const _generateBalanced = (fsm, minLength = 1) => {
     let word = _generateSingle(fsm, minLength);
 
-    while (!improve.isBalanced(word)) {
+    while (!balance.check(word, fsm.balanceLetters)) {
       word = _generateSingle(fsm, minLength);
     }
 
     if (config.logging) {
-      console.log(`Accepted balanced ${word} for ${fsm.ciphersLetter}`);
+      console.log(`Accepted balanced ${word} for ${fsm.ciphersLetter}, using ${fsm.balanceLetters[0]} | ${fsm.balanceLetters[1]}`);
     }
 
     return word;

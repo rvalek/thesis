@@ -1,6 +1,6 @@
 const words = require('./words');
 const config = require('../config');
-const improve = require('./improve');
+const balance = require('./balance');
 const util = require('./util');
 
 // TODO: add full logging to decryption process
@@ -15,7 +15,9 @@ module.exports = (FSMs) => {
   const _checkDecryptedParity = decryptedText => (decryptedText.length - 1) % 2
     === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
-  const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
+  const _acceptsWord = word => fsm => words.isAccepted(fsm, word)
+    && balance.check(word, fsm.balanceLetters);
+
   const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
@@ -33,12 +35,10 @@ module.exports = (FSMs) => {
       suffixLength -= 1
     ) {
       word = subCipher.slice(suffixLength);
-      if (improve.isBalanced(word)) {
-        acceptingFSM = possibleFSMs.find(_acceptsWord(word));
+      acceptingFSM = possibleFSMs.find(_acceptsWord(word));
 
-        if (acceptingFSM !== undefined) {
-          return { decipheredLetter: acceptingFSM.ciphersLetter, suffixLength };
-        }
+      if (acceptingFSM !== undefined) {
+        return { decipheredLetter: acceptingFSM.ciphersLetter, suffixLength };
       }
     }
 

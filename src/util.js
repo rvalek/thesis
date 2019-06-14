@@ -20,7 +20,9 @@ module.exports = (() => {
 
   const _save = (toPath, data) => {
     writeFile(toPath, data, (err) => {
-      if (config.logging) { console.log(err || `Wrote ${toPath}`); }
+      if (config.logging) {
+        console.log(err || `Wrote ${toPath}`);
+      }
     });
   };
 
@@ -35,7 +37,24 @@ module.exports = (() => {
     );
   };
 
-  const generateArray = (producer, length) => Array(length).fill().map(producer);
+  const generateArray = (producer, length) => Array(length)
+      .fill()
+      .map(producer);
+
+  const shuffle = ([...a]) => {
+    for (let i = a.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      // eslint-disable-next-line no-param-reassign
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const asHalves = ([...a]) => {
+    const middleIndex = Math.floor(a.length / 2);
+
+    return [a.slice(0, middleIndex), a.slice(middleIndex)];
+  };
 
   return {
     getRandomElement,
@@ -46,5 +65,7 @@ module.exports = (() => {
     matchesAlphabet,
     latinAlphabet,
     generateArray,
+    shuffle,
+    asHalves,
   };
 })();

@@ -94,28 +94,20 @@ module.exports = (() => {
     const acceptingTransition = _findTransitionIndex(newDka, acceptingCell);
     newDka.transitions[acceptingTransition].toStates = [newStateName];
 
+    // Adds laft and right letters for balancing
+    newDka.balanceLetters = util.asHalves(util.shuffle(util.latinAlphabet));
+
     return newDka;
   };
 
   const _makeHtmlTable = (fsm) => {
-    const headers = [`<i>'${fsm.ciphersLetter}'</i>`].concat(fsm.alphabet);
+    const header = [`<i>'${fsm.ciphersLetter}'</i>`, ...fsm.alphabet, ''];
 
-    headers.push('');
-
-    const tableRows = [];
-
-    for (let i = 0; i < fsm.states.length; i += 1) {
-      tableRows.push(Array(headers.length));
-      for (let j = 0; j < headers.length; j += 1) {
-        tableRows[i][j] = { text: [] };
-      }
-      tableRows[i][0] = { text: fsm.states[i].toString() };
-      tableRows[i][headers.length - 1] = fsm.acceptingStates.includes(
-        fsm.states[i],
-      )
-        ? { text: ['1'] }
-        : { text: ['0'] };
-    }
+    const tableRows = fsm.states.map((state, i) => [
+      { text: state },
+      ...(Array(header.length - 2).fill({ text: [] })),
+      { text: fsm.acceptingStates.includes(state) ? ['1'] : ['0'] },
+    ]);
 
     for (let i = 0; i < fsm.transitions.length; i += 1) {
       const transition = fsm.transitions[i];
@@ -149,8 +141,8 @@ module.exports = (() => {
     htmlString.push("<table border='1'>");
     htmlString.push('  <tr>');
 
-    for (let i = 0; i < headers.length; i += 1) {
-      htmlString.push(`    <th>${headers[i].toString()}</th>`);
+    for (let i = 0; i < header.length; i += 1) {
+      htmlString.push(`    <th>${header[i].toString()}</th>`);
     }
 
     htmlString.push('  </tr>');
