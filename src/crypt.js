@@ -3,7 +3,7 @@ const config = require('../config');
 const balance = require('./balance');
 const util = require('./util');
 
-// TODO: add full logging to decryption process
+// TODO: add full logging to decryption process?
 
 module.exports = (FSMs) => {
   const evenCheckLetter = config.sourceAlphabet[0];

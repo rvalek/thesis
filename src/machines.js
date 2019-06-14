@@ -1,7 +1,7 @@
 const util = require('../src/util');
 const config = require('../config');
 
-// TODO: add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
+// TODO?  add potentially empty transitions >> Math.ceil to Math.round and update _findTransitionIndex
 
 module.exports = (() => {
   const _baseFsm = (alphabet = [], states = []) => ({
@@ -103,60 +103,23 @@ module.exports = (() => {
   const _makeHtmlTable = (fsm) => {
     const header = [`<i>'${fsm.ciphersLetter}'</i>`, ...fsm.alphabet, ''];
 
-    const tableRows = fsm.states.map((state, i) => [
-      { text: state },
-      ...(Array(header.length - 2).fill({ text: [] })),
-      { text: fsm.acceptingStates.includes(state) ? ['1'] : ['0'] },
+    const tableRows = fsm.states.map(state => [
+      state,
+      ...fsm.alphabet.map(symbol => fsm.transitions
+          .filter(t => t.fromState === state && t.symbol === symbol)
+          .map(t => t.toStates)),
+      fsm.acceptingStates.includes(state) ? ['1'] : ['0'],
     ]);
 
-    for (let i = 0; i < fsm.transitions.length; i += 1) {
-      const transition = fsm.transitions[i];
+    const htmlString = [
+      '<table border="1">',
+      '  <tr>',
+      ...header.map(cell => `    <th>${cell}</th>`),
+      '  </tr>',
+      ...tableRows.flatMap(row => ['  <tr>', ...row.map(cell => `    <td>${cell}</td>`), '  </tr>']),
+      '</table>',
+    ];
 
-      let colNum;
-      let rowNum;
-
-      for (let j = 0; j < fsm.states.length; j += 1) {
-        if (fsm.states[j] === transition.fromState) {
-          rowNum = j;
-          break;
-        }
-      }
-
-      for (let j = 0; j < fsm.alphabet.length; j += 1) {
-        if (fsm.alphabet[j] === transition.symbol) {
-          colNum = j + 1;
-          break;
-        }
-      }
-
-      if (tableRows[rowNum][colNum].text === undefined) {
-        tableRows[rowNum][colNum] = { text: [] };
-      }
-
-      tableRows[rowNum][colNum].text.push(transition.toStates);
-    }
-
-    const htmlString = [];
-
-    htmlString.push("<table border='1'>");
-    htmlString.push('  <tr>');
-
-    for (let i = 0; i < header.length; i += 1) {
-      htmlString.push(`    <th>${header[i].toString()}</th>`);
-    }
-
-    htmlString.push('  </tr>');
-
-    for (let i = 0; i < tableRows.length; i += 1) {
-      htmlString.push('  <tr>');
-      for (let j = 0; j < tableRows[i].length; j += 1) {
-        htmlString.push(`    <td>${tableRows[i][j].text}</td>`);
-      }
-
-      htmlString.push('  </tr>');
-    }
-
-    htmlString.push('</table>');
     return htmlString.join('\n');
   };
 
