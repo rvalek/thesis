@@ -7,4 +7,5 @@ module.exports = {
   minCypherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/fsms',
   logging: cli.test !== undefined,
+  // logging: true,
 };

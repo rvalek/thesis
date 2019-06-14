@@ -8,9 +8,9 @@ module.exports = (FSMs) => {
   const oddCheckLetter = config.sourceAlphabet[1];
 
   const _generateParityCipher = sourceText => words.generate(
-      FSMs[util.ofEvenLength(sourceText) ? evenCheckLetter : oddCheckLetter],
+      FSMs[util.isLengthEven(sourceText) ? evenCheckLetter : oddCheckLetter],
     );
-  const _checkDecryptedParity = decryptedText => (decryptedText.length - 1) % 2
+  const _checkDecryptedParity = decryptedText => (decryptedText.length + 1) % 2
     === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
   const _acceptsWord = word => fsm => words.isAccepted(fsm, word)
@@ -56,7 +56,7 @@ module.exports = (FSMs) => {
     cipher,
     minLengthPerLetter = config.minCypherLengthPerSourceLetter,
   ) => {
-    let unparsed = cipher;
+    let remainingCipher = cipher;
     let deciphered = '';
     let suffixLength = -minLengthPerLetter;
     const continuationPoints = [];
@@ -64,32 +64,32 @@ module.exports = (FSMs) => {
     let found;
 
     for (;;) {
-      if (unparsed.length === 0) {
+      if (remainingCipher.length === 0) {
         if (_checkDecryptedParity(deciphered)) {
           break;
         }
       }
 
-      found = _decipherSuffix(unparsed, suffixLength);
+      found = _decipherSuffix(remainingCipher, suffixLength);
       if (found) {
-        continuationPoints.push([unparsed, deciphered, found.suffixLength - 1]);
+        continuationPoints.push([remainingCipher, deciphered, found.suffixLength - 1]);
 
-        unparsed = unparsed.slice(0, found.suffixLength);
+        remainingCipher = remainingCipher.slice(0, found.suffixLength);
         deciphered = found.decipheredLetter + deciphered;
         suffixLength = -config.minCypherLengthPerSourceLetter;
 
         if (config.logging) {
-          console.log(`Decryption step: ${unparsed} | ${deciphered}`);
+          console.log(`Decryption step: ${remainingCipher} | ${deciphered}`);
         }
       } else {
         if (continuationPoints.length === 0) {
           return 'Decryption failed.';
         }
 
-        [unparsed, deciphered, suffixLength] = continuationPoints.pop();
+        [remainingCipher, deciphered, suffixLength] = continuationPoints.pop();
 
         if (config.logging) {
-          console.log(`Found dead deciphering branch. Backtraching to: ${unparsed} | ${deciphered}`);
+          console.log(`Found dead deciphering branch. Backtracking to: ${remainingCipher} | ${deciphered}`);
         }
       }
     }

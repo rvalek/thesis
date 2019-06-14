@@ -8,7 +8,7 @@ module.exports = (() => {
   const getRandomElement = arr => (arr && arr.length ? arr[Math.floor(Math.random() * arr.length)] : null);
 
   // Predicate of where lenght of the given entity is even
-  const ofEvenLength = e => e.length % 2 === 0;
+  const isLengthEven = e => e.length % 2 === 0;
 
   // Validates provided source text against supported encryption alphabet.
   const matchesAlphabet = (word, alphabet) => {
@@ -58,7 +58,7 @@ module.exports = (() => {
 
   return {
     getRandomElement,
-    ofEvenLength,
+    isLengthEven,
     readJSON,
     writeJSON,
     writeHTML,
