@@ -22,7 +22,7 @@ module.exports = (() => {
     const dir = toPath.slice(0, toPath.lastIndexOf('/'));
 
     if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
+      fs.mkdirSync(dir);
     }
 
     fs.writeFile(toPath, data, (err) => {
@@ -62,20 +62,6 @@ module.exports = (() => {
     return { left: a.slice(0, middleIndex), right: a.slice(middleIndex) };
   };
 
-  const _nanosPerSec = 1e9;
-  const measureTime = f => (...args) => {
-    const time = process.hrtime();
-
-    const result = f(...args);
-
-    const diff = process.hrtime(time);
-    console.log(
-      `Execution tool ${diff[0] * _nanosPerSec + diff[1]} nanoseconds`,
-    );
-
-    return result;
-  };
-
   const _imbalanceCount = ([...word], { left, right }) => word.reduce((counter, char) => {
       if (left.includes(char)) {
         return counter + 1;
@@ -101,6 +87,5 @@ module.exports = (() => {
     shuffle,
     asHalves,
     isBalanced,
-    measureTime,
   };
 })();

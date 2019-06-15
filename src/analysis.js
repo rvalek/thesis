@@ -8,7 +8,26 @@ module.exports = (() => {
   const bestPerWord = (ws1, ws2) => ws1.map(word => maxForWord(word, ws2));
   const maxForArray = (ws1, ws2) => Math.max(...bestPerWord(ws1, ws2));
 
+  const _nanosPerSec = 1e9;
+  const measureTime = f => (...args) => {
+    const time = process.hrtime();
+
+    const result = f(...args);
+
+    const diff = process.hrtime(time);
+    console.log(
+      `Execution tool ${diff[0] * _nanosPerSec + diff[1]} nanoseconds`,
+    );
+
+    return result;
+  };
+
   return {
-    wordToWord, wordToArray, maxForWord, bestPerWord, maxForArray,
+    wordToWord,
+    wordToArray,
+    maxForWord,
+    bestPerWord,
+    maxForArray,
+    measureTime,
   };
 })();
