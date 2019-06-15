@@ -1,4 +1,4 @@
-const cli = require('./cli');
+const cli = require('./src/cli');
 
 module.exports = {
   sourceAlphabet: typeof cli.newKeys === 'string' ? cli.newKeys : ' abcdefghijklmnopqrstuvwxyz',
