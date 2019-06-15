@@ -19,6 +19,6 @@ module.exports = {
     'consistent-return': 'warn',
     'max-len': 'off',
     'indent': 'off',
-    'no-console': 'off'
+    'no-console': 'off',
   },
 };

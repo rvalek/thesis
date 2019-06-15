@@ -2,7 +2,7 @@ const words = require('./words');
 const config = require('../config');
 const util = require('./util');
 
-// TODO: does parity check actually word?
+// TODO: does parity check actually word? -- I think it does
 
 module.exports = (FSMs) => {
   const evenCheckLetter = config.sourceAlphabet[0];
@@ -19,7 +19,9 @@ module.exports = (FSMs) => {
   const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
-    if (subCipher.length === 0) { return null; }
+    if (subCipher.length === 0) {
+      return null;
+    }
 
     const possibleFSMs = _fsmsWithTeminatingSymbol(
       subCipher[subCipher.length - 1],
@@ -68,13 +70,18 @@ module.exports = (FSMs) => {
     for (;;) {
       if (remainingCipher.length === 0) {
         if (_checkDecryptedParity(deciphered)) {
+          if (config.logging) console.log('PARITY CHECK PASSED.');
           break;
-        }
+        } else if (config.logging) console.log('PARITY CHECK FAILED, RESUMING...');
       }
 
       found = _decipherSuffix(remainingCipher, suffixLength);
       if (found) {
-        continuationPoints.push([remainingCipher, deciphered, found.suffixLength - 1]);
+        continuationPoints.push([
+          remainingCipher,
+          deciphered,
+          found.suffixLength - 1,
+        ]);
 
         remainingCipher = remainingCipher.slice(0, found.suffixLength);
         deciphered = found.decipheredLetter + deciphered;
@@ -91,7 +98,9 @@ module.exports = (FSMs) => {
         [remainingCipher, deciphered, suffixLength] = continuationPoints.pop();
 
         if (config.logging) {
-          console.log(`Found dead deciphering branch. Backtracking to: ${remainingCipher} | ${deciphered}`);
+          console.log(
+            `Found dead deciphering branch. Backtracking to: ${remainingCipher} | ${deciphered}`,
+          );
         }
       }
     }
