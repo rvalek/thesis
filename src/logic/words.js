@@ -1,6 +1,5 @@
-const config = require('../config');
-const util = require('./util');
-const balance = require('./balance');
+const config = require('../../config');
+const util = require('../util');
 
 module.exports = (() => {
   // Produces a set of target states from given states and a symbol.
@@ -47,7 +46,7 @@ module.exports = (() => {
   const _generateBalanced = (fsm, minLength = 1) => {
     let word = _generateSingle(fsm, minLength);
 
-    while (!balance.check(word, fsm.balanceLetters)) {
+    while (!util.isBalanced(word, fsm.balanceLetters)) {
       word = _generateSingle(fsm, minLength);
     }
 
@@ -68,7 +67,7 @@ module.exports = (() => {
       : util.generateArray(() => _generateBalanced(fsm, minLength), num));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
-  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state)) && balance.check(word, fsm.balanceLetters);
+  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state)) && util.isBalanced(word, fsm.balanceLetters);
 
   return { generate, isAccepted };
 })();

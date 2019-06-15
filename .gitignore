@@ -2,5 +2,5 @@
 node_modules/
 .vscode/
 out/
-stuff/
+stuff*
 resources/

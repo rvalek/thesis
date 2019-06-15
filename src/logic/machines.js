@@ -1,4 +1,4 @@
-const util = require('./util');
+const util = require('../util');
 const words = require('./words');
 
 // TODO: sort out _createRandom and maxNumToStates

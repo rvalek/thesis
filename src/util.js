@@ -1,4 +1,4 @@
-const { writeFile, readFileSync } = require('fs');
+const fs = require('fs');
 const config = require('../config');
 
 module.exports = (() => {
@@ -19,14 +19,20 @@ module.exports = (() => {
   };
 
   const _save = (toPath, data) => {
-    writeFile(toPath, data, (err) => {
+    const dir = toPath.slice(0, toPath.lastIndexOf('/'));
+
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir);
+    }
+
+    fs.writeFile(toPath, data, (err) => {
       if (config.logging) {
         console.log(err || `Wrote ${toPath}`);
       }
     });
   };
 
-  const readJSON = fromPath => JSON.parse(readFileSync(`${fromPath}.json`));
+  const readJSON = fromPath => JSON.parse(fs.readFileSync(`${fromPath}.json`));
   const writeJSON = (toPath, data) => {
     _save(`${toPath}.json`, JSON.stringify(data));
   };
@@ -56,6 +62,33 @@ module.exports = (() => {
     return { left: a.slice(0, middleIndex), right: a.slice(middleIndex) };
   };
 
+  const _nanosPerSec = 1e9;
+  const measureTime = f => (...args) => {
+    const time = process.hrtime();
+
+    const result = f(...args);
+
+    const diff = process.hrtime(time);
+    console.log(
+      `Execution tool ${diff[0] * _nanosPerSec + diff[1]} nanoseconds`,
+    );
+
+    return result;
+  };
+
+  const _imbalanceCount = ([...word], { left, right }) => word.reduce((counter, char) => {
+      if (left.includes(char)) {
+        return counter + 1;
+      }
+      if (right.includes(char)) {
+        return counter - 1;
+      }
+
+      return counter;
+    }, 0);
+
+  const isBalanced = (word, halves, tolerance = 1) => Math.abs(_imbalanceCount(word, halves)) <= tolerance;
+
   return {
     getRandomElement,
     isLengthEven,
@@ -67,5 +100,7 @@ module.exports = (() => {
     generateArray,
     shuffle,
     asHalves,
+    isBalanced,
+    measureTime,
   };
 })();

@@ -1,6 +1,6 @@
 const words = require('./words');
-const config = require('../config');
-const util = require('./util');
+const config = require('../../config');
+const util = require('../util');
 
 // TODO: does parity check actually word? -- I think it does
 
@@ -11,8 +11,13 @@ module.exports = (FSMs) => {
   const _generateParityCipher = sourceText => words.generate(
       FSMs[util.isLengthEven(sourceText) ? evenCheckLetter : oddCheckLetter],
     );
-  const _checkDecryptedParity = decryptedText => (decryptedText.length + 1) % 2
-    === (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
+  // const _checkDecryptedParity = decryptedText =>
+  //   (decryptedText.length + 1) % 2 ===
+  //   (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
+
+  const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === evenCheckLetter
+      ? util.isLengthEven(decryptedText - 1)
+      : !util.isLengthEven(decryptedText - 1));
 
   const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
 
@@ -72,7 +77,7 @@ module.exports = (FSMs) => {
         if (_checkDecryptedParity(deciphered)) {
           if (config.logging) console.log('PARITY CHECK PASSED.');
           break;
-        } else if (config.logging) console.log('PARITY CHECK FAILED, RESUMING...');
+        } else if (config.logging) { console.log('PARITY CHECK FAILED, RESUMING...'); }
       }
 
       found = _decipherSuffix(remainingCipher, suffixLength);
