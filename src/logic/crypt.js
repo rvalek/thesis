@@ -77,7 +77,9 @@ module.exports = (FSMs) => {
         if (_checkDecryptedParity(deciphered)) {
           if (config.logging) console.log('PARITY CHECK PASSED.');
           break;
-        } else if (config.logging) { console.log('PARITY CHECK FAILED, RESUMING...'); }
+        } else if (config.logging) {
+          console.log('PARITY CHECK FAILED, RESUMING...');
+        }
       }
 
       found = _decipherSuffix(remainingCipher, suffixLength);

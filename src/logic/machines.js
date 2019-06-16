@@ -18,7 +18,9 @@ module.exports = (() => {
       util.generateArray((_, i) => `s${i}`, numStates),
     );
 
-    const selectTargetState = () => (Math.round(Math.random() <= transitionPercent / 100) ? [util.getRandomElement(newFsm.states)] : []);
+    const selectTargetState = () => (Math.round(Math.random() <= transitionPercent / 100)
+        ? [util.getRandomElement(newFsm.states)]
+        : []);
 
     newFsm.transitions = newFsm.states.flatMap(fromState => newFsm.alphabet.map(symbol => ({
         fromState,
@@ -86,7 +88,7 @@ module.exports = (() => {
     } while (!_isAcceptingStateReachable(newFsm));
 
     newFsm.ciphersLetter = letter;
-    newFsm.balanceLetters = util.asHalves(util.shuffle(util.latinAlphabet));
+    newFsm.balancing = util.asHalves(util.shuffle(newFsm.alphabet));
 
     return newFsm;
   };
@@ -102,11 +104,11 @@ module.exports = (() => {
       fsm.acceptingStates.includes(state) ? ['1'] : ['0'],
     ]);
 
-    const balanceLetters = [
+    const balancing = [
       '<span>',
       `  <b>Balancing</b> -- <b>Left:</b> ${
-        fsm.balanceLetters.left
-      }; <b>Right:</b> ${fsm.balanceLetters.right};`,
+        fsm.balancing.left
+      }; <b>Right:</b> ${fsm.balancing.right};`,
       '</span>',
     ];
 
@@ -121,7 +123,7 @@ module.exports = (() => {
         '  </tr>',
       ]),
       '</table>',
-      ...balanceLetters,
+      ...balancing,
       '</br>',
     ];
 

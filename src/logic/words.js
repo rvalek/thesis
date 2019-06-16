@@ -46,12 +46,16 @@ module.exports = (() => {
   const _generateBalanced = (fsm, minLength = 1) => {
     let word = _generateSingle(fsm, minLength);
 
-    while (!util.isBalanced(word, fsm.balanceLetters)) {
+    while (!util.isBalanced(word, fsm.balancing)) {
       word = _generateSingle(fsm, minLength);
     }
 
     if (config.logging) {
-      console.log(`Accepted balanced ${word} for ${fsm.ciphersLetter}, with L: ${fsm.balanceLetters.left}; R: ${fsm.balanceLetters.right};`);
+      console.log(
+        `Accepted balanced ${word} for ${fsm.ciphersLetter}, with L: ${
+          fsm.balancing.left
+        }; R: ${fsm.balancing.right};`,
+      );
     }
 
     return word;
@@ -67,7 +71,8 @@ module.exports = (() => {
       : util.generateArray(() => _generateBalanced(fsm, minLength), num));
 
   // A predicate of whether reading a given word results in accepting state by a machine.
-  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state)) && util.isBalanced(word, fsm.balanceLetters);
+  const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state))
+    && util.isBalanced(word, fsm.balancing);
 
   return { generate, isAccepted };
 })();
