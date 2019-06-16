@@ -143,5 +143,6 @@ module.exports = (() => {
           {},
         ));
 
-  return { generate, toHtml };
+  // Internals are exposed for analysis
+  return { generate, toHtml, _generateSingle };
 })();

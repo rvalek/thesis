@@ -44,11 +44,11 @@ module.exports = (() => {
 
   // _generateSingle that is balanced
   const _generateBalanced = (fsm, minLength = 1) => {
-    let word = _generateSingle(fsm, minLength);
+    let word;
 
-    while (!util.isBalanced(word, fsm.balancing)) {
+    do {
       word = _generateSingle(fsm, minLength);
-    }
+    } while (!util.isBalanced(word, fsm.balancing));
 
     if (config.logging) {
       console.log(
@@ -74,5 +74,11 @@ module.exports = (() => {
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state))
     && util.isBalanced(word, fsm.balancing);
 
-  return { generate, isAccepted };
+  // Internals are exposed for analysis
+  return {
+    generate,
+    isAccepted,
+    _generateBalanced,
+    _generateSingle,
+  };
 })();
