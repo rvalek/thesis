@@ -16,8 +16,8 @@ module.exports = (FSMs) => {
   //   (decryptedText.slice(-1) === evenCheckLetter ? 0 : 1);
 
   const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === evenCheckLetter
-      ? util.isLengthEven(decryptedText - 1)
-      : !util.isLengthEven(decryptedText - 1));
+      ? !util.isLengthEven(decryptedText)
+      : util.isLengthEven(decryptedText));
 
   const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
 

@@ -1,5 +1,4 @@
 const util = require('../util');
-const words = require('./words');
 
 // TODO: sort out _createRandom and maxNumToStates
 
@@ -12,88 +11,83 @@ module.exports = (() => {
     transitions: [],
   });
 
-  // Produces an FSM object with given properties and randomly generated transitions.
-  const _createRandom = (alphabet, numStates, maxNumToStates = 1) => {
+  // Produces a random FSM with given properties and about half of transitions
+  const _createRandom = (alphabet, numStates, transitionPercent = 35) => {
     const newFsm = _baseFsm(
       alphabet,
       util.generateArray((_, i) => `s${i}`, numStates),
     );
 
-    // Generate random but valid set of transitions
-    for (let i = 0; i < numStates; i += 1) {
-      for (let j = 0; j < newFsm.alphabet.length; j += 1) {
-        const numToStates = Math.ceil(Math.random() * maxNumToStates);
+    const selectTargetState = () => (Math.round(Math.random() <= transitionPercent / 100) ? [util.getRandomElement(newFsm.states)] : []);
 
-        if (numToStates > 0) {
-          // const _someMath = (_, i) => {
-          //   let diff = newFsm.states.length - i - (numToStates - toStates.length) + 1;
-          //   diff = diff <= 0 ? 1 : 1 / diff;
-
-          //   if (Math.random() <= diff) {
-          //     return newFsm.states[i];
-          //   }
-          // };
-          // const toStates = util.generateArray(_someMath, Math.max(numToStates, newFsm.states.length)).filter(e => e !== undefined);
-          const toStates = [];
-          for (
-            let k = 0;
-            k < newFsm.states.length && toStates.length < numToStates;
-            k += 1
-          ) {
-            let diff = newFsm.states.length - k - (numToStates - toStates.length) + 1;
-            diff = diff <= 0 ? 1 : 1 / diff;
-
-            if (Math.random() <= diff) {
-              toStates.push(newFsm.states[k]);
-            }
-          }
-
-          newFsm.transitions.push({
-            fromState: newFsm.states[i],
-            symbol: newFsm.alphabet[j],
-            toStates,
-          });
-        }
-      }
-    }
+    newFsm.transitions = newFsm.states.flatMap(fromState => newFsm.alphabet.map(symbol => ({
+        fromState,
+        symbol,
+        toStates: selectTargetState(),
+      })));
 
     return newFsm;
   };
 
+  const _isAcceptingStateReachable = (fsm) => {
+    const unprocessedStates = [fsm.initialState];
+    const reachableStates = [];
+
+    while (unprocessedStates.length !== 0) {
+      const currentState = unprocessedStates.pop();
+
+      for (let i = 0; i < fsm.transitions.length; i += 1) {
+        const transition = fsm.transitions[i];
+
+        if (currentState === transition.fromState) {
+          for (let j = 0; j < transition.toStates.length; j += 1) {
+            const state = transition.toStates[j];
+
+            if (!reachableStates.includes(state)) {
+              reachableStates.push(transition.toStates[j]);
+
+              if (!unprocessedStates.includes(state)) {
+                unprocessedStates.push(state);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return fsm.acceptingStates.some(acceptingState => reachableStates.includes(acceptingState));
+  };
+
   const _generateSingle = (letter, alphabet, operationalStates) => {
-    const newFsm = _createRandom(alphabet, operationalStates);
+    let newFsm;
+
+    do {
+      newFsm = _createRandom(alphabet, operationalStates);
+
+      // Chooses a cell that would point to the accepting state
+      const randomTransition = util.getRandomElement(newFsm.transitions);
+      const acceptingCell = {
+        state: randomTransition.fromState,
+        symbol: randomTransition.symbol,
+      };
+      newFsm.acceptingCells = [acceptingCell];
+
+      // Adds a state and makes it the only accepting one
+      const newStateName = 'sX';
+      newFsm.states.push(newStateName);
+      newFsm.acceptingStates = [newStateName];
+
+      // Determines the transition from the chosen accepting cell
+      // Points it to the accepting state
+      newFsm.transitions.find(
+        t => t.fromState === acceptingCell.state
+          && t.symbol === acceptingCell.symbol,
+      ).toStates = [newStateName];
+    } while (!_isAcceptingStateReachable(newFsm));
+
     newFsm.ciphersLetter = letter;
-
-    // Randomly drops about half of transitions
-    newFsm.transitions = newFsm.transitions.filter(() => Math.round(Math.random()));
-
-    // Chooses a cell that would point to the accepting state
-    // Makes sure it wasn't chosen in any other dka
-    const randomTransition = util.getRandomElement(newFsm.transitions);
-    const acceptingCell = {
-      state: randomTransition.fromState,
-      symbol: randomTransition.symbol,
-    };
-    newFsm.acceptingCells = [acceptingCell];
-
-    // Adds a state and makes it the only accepting one
-    const newStateName = 'sX';
-    newFsm.states.push(newStateName);
-    newFsm.acceptingStates = [newStateName];
-
-    // Determines the transition from the chosen accepting cell
-    // Points it to the accepting state
-    newFsm.transitions.find(
-      t => t.fromState === acceptingCell.state && t.symbol === acceptingCell.symbol,
-    ).toStates = [newStateName];
-
-    // Adds laft and right letters for balancing
     newFsm.balanceLetters = util.asHalves(util.shuffle(util.latinAlphabet));
 
-    if (!words.generate(newFsm)) {
-      console.log('Achtung!');
-      return _generateSingle(letter, alphabet, operationalStates);
-    }
     return newFsm;
   };
 

@@ -1,8 +1,9 @@
 const cli = require('./src/cli');
+const util = require('./src/util');
 
 module.exports = {
-  sourceAlphabet: typeof cli.newKeys === 'string' ? cli.newKeys : ' abcdefghijklmnopqrstuvwxyz',
-  fsmAlphabet: 'abcdefghijklmnopqrstuvwxyzABC',
+  sourceAlphabet: ` ${util.latinAlphabet}`,
+  fsmAlphabet: `ABC${util.latinAlphabet}`,
   fsmStates: 4,
   minCypherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/fsms',
