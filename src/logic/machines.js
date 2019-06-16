@@ -1,6 +1,5 @@
 const util = require('../util');
-
-// TODO: sort out _createRandom and maxNumToStates
+const config = require('../../config');
 
 module.exports = (() => {
   const _baseFsm = (alphabet = [], states = []) => ({
@@ -12,13 +11,13 @@ module.exports = (() => {
   });
 
   // Produces a random FSM with given properties and about half of transitions
-  const _createRandom = (alphabet, numStates, transitionPercent = 35) => {
+  const _createRandom = (alphabet, numStates, transitionFillPercent = config.fsmTransitionFillPercent) => {
     const newFsm = _baseFsm(
       alphabet,
       util.generateArray((_, i) => `s${i}`, numStates),
     );
 
-    const selectTargetState = () => (Math.round(Math.random() <= transitionPercent / 100)
+    const selectTargetState = () => (Math.round(Math.random() <= transitionFillPercent / 100)
         ? [util.getRandomElement(newFsm.states)]
         : []);
 
