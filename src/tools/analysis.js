@@ -24,7 +24,7 @@ module.exports = (() => {
 
   const _microsInSec = 1e3;
   const _nanosInMicro = 1e6;
-  const measureExecutionTime = f => (...args) => {
+  const addTiming = f => (...args) => {
     const time = process.hrtime();
 
     const result = f(...args);
@@ -34,8 +34,15 @@ module.exports = (() => {
     return { result, time: seconds * _microsInSec + nanos / _nanosInMicro };
   };
 
-  const _doMetric = (func, argGenerator, info, times) => {
-    const timedFunc = measureExecutionTime(func);
+  const _measureExecutionTime = (
+    func,
+    argGenerator,
+    info,
+    times,
+    returnFuncResults = false,
+  ) => {
+    const timedFunc = addTiming(func);
+    const funcResults = [];
 
     console.log('\n', ...info);
 
@@ -43,7 +50,13 @@ module.exports = (() => {
 
     let runningTotal = 0;
     for (let i = 0; i < times; i += 1) {
-      runningTotal += timedFunc(...argGenerator()).time;
+      const { time, result } = timedFunc(...argGenerator());
+
+      runningTotal += time;
+
+      if (returnFuncResults) {
+        funcResults.push(result);
+      }
 
       if ((i + 1) % percent === 0) {
         process.stdout.write('.');
@@ -53,11 +66,13 @@ module.exports = (() => {
     process.stdout.cursorTo(0);
 
     console.log(`  ${times} runs: ${runningTotal} ms`);
-    console.log(`  Average: ${runningTotal / times} ms`);
+    console.log(`  Average time: ${runningTotal / times} ms`);
+
+    return funcResults;
   };
 
   const fsmGen = (times) => {
-    _doMetric(
+    _measureExecutionTime(
       machines._generateSingle,
       () => defaultFsmConfig,
       ['FSM Generation.', 'Alpbabet length: 27.', 'Operational states: 4.'],
@@ -71,7 +86,7 @@ module.exports = (() => {
       8,
     ];
 
-    _doMetric(
+    _measureExecutionTime(
       machines._generateSingle,
       () => args,
       ['FSM Generation.', 'Alpbabet length: 52.', 'Operational states: 8.'],
@@ -82,7 +97,7 @@ module.exports = (() => {
   const cipherLetter = (times) => {
     const args = [machines._generateSingle(...defaultFsmConfig), 3];
 
-    _doMetric(
+    _measureExecutionTime(
       words._generateSingle,
       () => args,
       [
@@ -97,7 +112,7 @@ module.exports = (() => {
   const cipherLetterBalanced = (times) => {
     const args = [machines._generateSingle(...defaultFsmConfig), 3];
 
-    _doMetric(
+    _measureExecutionTime(
       words._generateBalanced,
       () => args,
       [
@@ -114,38 +129,46 @@ module.exports = (() => {
     const keys = machines.generate(...defaultKeysConfig);
     const system = crypt(keys);
 
-    _doMetric(
+    const ciphers = _measureExecutionTime(
       system.encrypt,
       () => [_pangram, 3],
       [
         'Full encryption.',
-        'Source text: 44 characters.',
+        'Source text: 43 characters.',
         'FSM: Standard (27/4)',
       ],
       times,
+      true,
     );
+
+    const averageLength = ciphers.reduce((acc, next) => acc + next.length, 0) / ciphers.length;
+    console.log(`  Average length increase: x${averageLength / 43}`);
   };
   const encryptTextBig = (times) => {
     const keys = machines.generate(...defaultKeysConfig);
     const system = crypt(keys);
 
-    _doMetric(
+    const ciphers = _measureExecutionTime(
       system.encrypt,
       () => [_lorem, 3],
       [
         'Full encryption.',
-        'Source text: 116 characters.',
+        'Source text: 115 characters.',
         'FSM: Standard (27/4)',
       ],
       times,
+      true,
     );
+
+    const averageLength = ciphers.reduce((acc, next) => acc + next.length, 0) / ciphers.length;
+    console.log(`  Average length increase: x${averageLength / 115}`);
   };
 
   const decryptText = (times) => {
     const keys = machines.generate(...defaultKeysConfig);
     const system = crypt(keys);
 
-    _doMetric(
+    _measureExecutionTime(
       system.decrypt,
       () => [system.encrypt(_pangram, 3), 3],
       [
@@ -160,7 +183,7 @@ module.exports = (() => {
     const keys = machines.generate(...defaultKeysConfig);
     const system = crypt(keys);
 
-    _doMetric(
+    _measureExecutionTime(
       system.decrypt,
       () => [system.encrypt(_lorem, 3), 3],
       [
@@ -193,36 +216,38 @@ module.exports = (() => {
 ALL METRICS:
 
  FSM Generation. Alpbabet length: 27. Operational states: 4.
-  1000 runs: 59.33876699999991 ms
-  Average: 0.05933876699999991 ms
+  1000 runs: 65.51263400000009 ms
+  Average time: 0.0655126340000001 ms
 
  FSM Generation. Alpbabet length: 52. Operational states: 8.
-  1000 runs: 197.64921200000012 ms
-  Average: 0.19764921200000013 ms
+  1000 runs: 235.9153329999996 ms
+  Average time: 0.23591533299999962 ms
 
  Cipher generation. Single letter. Balancing: OFF. FSM: Standard (27/4)
-  1000 runs: 18.352156000000026 ms
-  Average: 0.018352156000000026 ms
+  1000 runs: 20.076099000000017 ms
+  Average time: 0.020076099000000017 ms
 
  Cipher generation. Single letter. Balancing: ON. FSM: Standard (27/4)
-  1000 runs: 48.39357400000003 ms
-  Average: 0.04839357400000003 ms
+  1000 runs: 28.768396000000017 ms
+  Average time: 0.028768396000000016 ms
 
- Full encryption. Source text: 44 characters. FSM: Standard (27/4)
-  1000 runs: 874.6428689999997 ms
-  Average: 0.8746428689999997 ms
+ Full encryption. Source text: 43 characters. FSM: Standard (27/4)
+  1000 runs: 976.3135669999998 ms
+  Average time: 0.9763135669999998 ms
+  Average length increase: x5.070348837209303
 
- Full encryption. Source text: 116 characters. FSM: Standard (27/4)
-  1000 runs: 2293.5559540000027 ms
-  Average: 2.2935559540000026 ms
+ Full encryption. Source text: 115 characters. FSM: Standard (27/4)
+  1000 runs: 2170.1840189999984 ms
+  Average time: 2.1701840189999984 ms
+  Average length increase: x5.644695652173913
 
  Full decryption. Source text: 44 characters. FSM: Standard (27/4)
-  100 runs: 2762.3652460000008 ms
-  Average: 27.623652460000006 ms
+  100 runs: 5918.435308999999 ms
+  Average time: 59.18435308999999 ms
 
  Full decryption. Source text: 116 characters. FSM: Standard (27/4)
-  100 runs: 146321.18213200005 ms
-  Average: 1463.2118213200004 ms
+  100 runs: 71993.55851599999 ms
+  Average time: 719.9355851599998 ms
 
   */
 
@@ -232,9 +257,7 @@ ALL METRICS:
     maxForWord,
     bestPerWord,
     maxForArray,
-    measureExecutionTime,
-    fsmGen,
-    fsmGenBig,
+    measureExecutionTime: addTiming,
     runAll,
   };
 })();
