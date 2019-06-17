@@ -1,5 +1,5 @@
 const config = require('../../config');
-const util = require('../util');
+const util = require('../tools/util');
 
 module.exports = (() => {
   // Produces a set of target states from given states and a symbol.

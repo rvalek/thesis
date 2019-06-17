@@ -1,6 +1,6 @@
 const config = require('../config');
 const machines = require('./logic/machines');
-const util = require('./util');
+const util = require('./tools/util');
 
 module.exports = (() => {
   const makeKeys = () => {
@@ -10,7 +10,10 @@ module.exports = (() => {
       config.fsmStates,
     );
     util.writeJSON(config.fsmSavePath, keys);
-    util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
+
+    if (config.logging) {
+      util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
+    }
 
     return keys;
   };

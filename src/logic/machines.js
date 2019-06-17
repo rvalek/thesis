@@ -1,4 +1,4 @@
-const util = require('../util');
+const util = require('../tools/util');
 const config = require('../../config');
 
 module.exports = (() => {
@@ -11,7 +11,11 @@ module.exports = (() => {
   });
 
   // Produces a random FSM with given properties and about half of transitions
-  const _createRandom = (alphabet, numStates, transitionFillPercent = config.fsmTransitionFillPercent) => {
+  const _createRandom = (
+    alphabet,
+    numStates,
+    transitionFillPercent = config.fsmTransitionFillPercent,
+  ) => {
     const newFsm = _baseFsm(
       alphabet,
       util.generateArray((_, i) => `s${i}`, numStates),
