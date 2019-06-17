@@ -7,5 +7,5 @@ module.exports = {
   fsmTransitionFillPercent: 35,
   minCipherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/fsms',
-  logging: true,
+  logging: false,
 };

@@ -6,4 +6,5 @@ module.exports = program
   .option('-e, --encrypt <text>', 'encrypt text')
   .option('-d, --decrypt <text>', 'decrypt text')
   .option('-t, --test <text>', 'run testing on text')
+  .option('-a, --analysis', 'run full analysis and print metrics')
   .parse(process.argv);

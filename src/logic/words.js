@@ -16,7 +16,7 @@ module.exports = (() => {
     );
 
   // Produces a random word of certain minimal length, accepted by a given machine.
-  const _generateSingle = (fsm, minLength = 1) => {
+  const _generateSingle = (fsm, minLength) => {
     const trail = [];
     let currentState = util.getRandomElement(fsm.acceptingStates);
     const leadsToCurrentState = trans => trans.toStates.includes(currentState);
@@ -43,7 +43,7 @@ module.exports = (() => {
   };
 
   // _generateSingle that is balanced
-  const _generateBalanced = (fsm, minLength = 1) => {
+  const _generateBalanced = (fsm, minLength) => {
     let word;
 
     do {
@@ -62,13 +62,7 @@ module.exports = (() => {
   };
 
   // Produces requested number of random string, accepted by a given machine.
-  const generate = (
-    fsm,
-    minLength,
-    num = 1,
-  ) => (num === 1
-      ? _generateBalanced(fsm, minLength)
-      : util.generateArray(() => _generateBalanced(fsm, minLength), num));
+  const generate = (fsm, minLength = 1) => _generateBalanced(fsm, minLength);
 
   // A predicate of whether reading a given word results in accepting state by a machine.
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state))

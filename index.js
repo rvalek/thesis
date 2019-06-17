@@ -1,8 +1,14 @@
 const top = require('./src/top');
 const crypt = require('./src/logic/crypt');
 const cli = require('./src/tools/cli');
+const analysis = require('./src/tools/analysis');
 
 (() => {
+  if (cli.analysis) {
+    analysis.runAll();
+    return;
+  }
+
   const keys = cli.newKeys ? top.makeKeys() : top.loadKeys();
   const system = crypt(keys);
 
