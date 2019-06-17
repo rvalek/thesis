@@ -75,6 +75,18 @@ module.exports = (() => {
 
   const isBalanced = (word, halves, tolerance = 1) => Math.abs(_imbalanceCount(word, halves)) <= tolerance;
 
+  const _microsInSec = 1e3;
+  const _nanosInMicro = 1e6;
+  const addTiming = func => (...args) => {
+    const time = process.hrtime();
+
+    const result = func(...args);
+
+    const [seconds, nanos] = process.hrtime(time);
+
+    return { result, time: seconds * _microsInSec + nanos / _nanosInMicro };
+  };
+
   return {
     getRandomElement,
     isLengthEven,
@@ -87,5 +99,6 @@ module.exports = (() => {
     shuffle,
     asHalves,
     isBalanced,
+    addTiming,
   };
 })();

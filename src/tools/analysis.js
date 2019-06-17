@@ -15,25 +15,6 @@ module.exports = (() => {
     4,
   ];
 
-  const wordToWord = (w1, w2) => strSim.compareTwoStrings(w1, w2);
-  // const wordToMany = (w1, words) => strSim.findBestMatch(w1, words);
-  const wordToArray = (w, ws) => ws.map(word => wordToWord(w, word));
-  const maxForWord = (w, ws) => Math.max(...wordToArray(w, ws));
-  const bestPerWord = (ws1, ws2) => ws1.map(word => maxForWord(word, ws2));
-  const maxForArray = (ws1, ws2) => Math.max(...bestPerWord(ws1, ws2));
-
-  const _microsInSec = 1e3;
-  const _nanosInMicro = 1e6;
-  const addTiming = f => (...args) => {
-    const time = process.hrtime();
-
-    const result = f(...args);
-
-    const [seconds, nanos] = process.hrtime(time);
-
-    return { result, time: seconds * _microsInSec + nanos / _nanosInMicro };
-  };
-
   const _measureExecutionTime = (
     func,
     argGenerator,
@@ -41,12 +22,12 @@ module.exports = (() => {
     times,
     returnFuncResults = false,
   ) => {
-    const timedFunc = addTiming(func);
+    const timedFunc = util.addTiming(func);
     const funcResults = [];
 
     console.log('\n', ...info);
 
-    const percent = times / 100;
+    const onePercent = times / 100;
 
     let runningTotal = 0;
     for (let i = 0; i < times; i += 1) {
@@ -58,15 +39,15 @@ module.exports = (() => {
         funcResults.push(result);
       }
 
-      if ((i + 1) % percent === 0) {
+      if ((i + 1) % onePercent === 0) {
         process.stdout.write('.');
       }
     }
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
 
-    console.log(`  ${times} runs: ${runningTotal} ms`);
-    console.log(`  Average time: ${runningTotal / times} ms`);
+    console.log(`  ${times} runs: ${(runningTotal).toFixed(3)} ms`);
+    console.log(`  Average time: ${(runningTotal / times).toFixed(3)} ms`);
 
     return funcResults;
   };
@@ -104,7 +85,7 @@ module.exports = (() => {
         'Cipher generation.',
         'Single letter.',
         'Balancing: OFF.',
-        'FSM: Standard (27/4)',
+        'FSM: Standard (27/4).',
       ],
       times,
     );
@@ -119,7 +100,7 @@ module.exports = (() => {
         'Cipher generation.',
         'Single letter.',
         'Balancing: ON.',
-        'FSM: Standard (27/4)',
+        'FSM: Standard (27/4).',
       ],
       times,
     );
@@ -135,14 +116,14 @@ module.exports = (() => {
       [
         'Full encryption.',
         'Source text: 43 characters.',
-        'FSM: Standard (27/4)',
+        'FSMs: Standard (27/4).',
       ],
       times,
       true,
     );
 
     const averageLength = ciphers.reduce((acc, next) => acc + next.length, 0) / ciphers.length;
-    console.log(`  Average length increase: x${averageLength / 43}`);
+    console.log(`  Average length increase: x${(averageLength / 43).toFixed(2)}`);
   };
   const encryptTextBig = (times) => {
     const keys = machines.generate(...defaultKeysConfig);
@@ -154,14 +135,14 @@ module.exports = (() => {
       [
         'Full encryption.',
         'Source text: 115 characters.',
-        'FSM: Standard (27/4)',
+        'FSMs: Standard (27/4).',
       ],
       times,
       true,
     );
 
     const averageLength = ciphers.reduce((acc, next) => acc + next.length, 0) / ciphers.length;
-    console.log(`  Average length increase: x${averageLength / 115}`);
+    console.log(`  Average length increase: x${(averageLength / 115).toFixed(2)}`);
   };
 
   const decryptText = (times) => {
@@ -174,7 +155,7 @@ module.exports = (() => {
       [
         'Full decryption.',
         'Source text: 44 characters.',
-        'FSM: Standard (27/4)',
+        'FSMs: Standard (27/4).',
       ],
       times,
     );
@@ -189,11 +170,22 @@ module.exports = (() => {
       [
         'Full decryption.',
         'Source text: 116 characters.',
-        'FSM: Standard (27/4)',
+        'FSMs: Standard (27/4).',
       ],
       times,
     );
   };
+
+  const languageSimilarity = () => {
+    const keys = machines.generate(...defaultKeysConfig);
+    const stringPerLanguge = Object.values(keys).map(fsm => util.generateArray(() => words._generateBalanced(fsm), 100).join(''));
+    const corsPerLanguage = stringPerLanguge.map((str, i) => stringPerLanguge.reduce((acc, next, j) => j !== i ? [...acc, strSim.compareTwoStrings(str, next)] : acc, []));
+    const avgCorPerLanguage = corsPerLanguage.map(cors => cors.reduce((acc, next) => acc + next) / cors.length);
+    const totalAverage = avgCorPerLanguage.reduce((acc, next) => acc + next) / avgCorPerLanguage.length;
+
+    console.log('\n', 'Average language similarity.','FSMs: Standard (27/4).');
+    console.log(`  27 languages: ${totalAverage.toFixed(3) * 100}%`);
+  }
 
   const runAll = () => {
     console.log('ALL METRICS:');
@@ -209,55 +201,55 @@ module.exports = (() => {
 
     decryptText(100);
     decryptTextBig(100);
+
+    languageSimilarity();
   };
 
   /*
 
+Roberts-MacBook-Pro-2:thesis robertvalek$ node index.js node index.js -a
 ALL METRICS:
 
  FSM Generation. Alpbabet length: 27. Operational states: 4.
-  1000 runs: 65.51263400000009 ms
-  Average time: 0.0655126340000001 ms
+  1000 runs: 54.124 ms
+  Average time: 0.054 ms
 
  FSM Generation. Alpbabet length: 52. Operational states: 8.
-  1000 runs: 235.9153329999996 ms
-  Average time: 0.23591533299999962 ms
+  1000 runs: 217.960 ms
+  Average time: 0.218 ms
 
- Cipher generation. Single letter. Balancing: OFF. FSM: Standard (27/4)
-  1000 runs: 20.076099000000017 ms
-  Average time: 0.020076099000000017 ms
+ Cipher generation. Single letter. Balancing: OFF. FSM: Standard (27/4).
+  1000 runs: 19.131 ms
+  Average time: 0.019 ms
 
- Cipher generation. Single letter. Balancing: ON. FSM: Standard (27/4)
-  1000 runs: 28.768396000000017 ms
-  Average time: 0.028768396000000016 ms
+ Cipher generation. Single letter. Balancing: ON. FSM: Standard (27/4).
+  1000 runs: 28.069 ms
+  Average time: 0.028 ms
 
- Full encryption. Source text: 43 characters. FSM: Standard (27/4)
-  1000 runs: 976.3135669999998 ms
-  Average time: 0.9763135669999998 ms
-  Average length increase: x5.070348837209303
+ Full encryption. Source text: 43 characters. FSMs: Standard (27/4).
+  1000 runs: 1009.861 ms
+  Average time: 1.010 ms
+  Average length increase: x5.71
 
- Full encryption. Source text: 115 characters. FSM: Standard (27/4)
-  1000 runs: 2170.1840189999984 ms
-  Average time: 2.1701840189999984 ms
-  Average length increase: x5.644695652173913
+ Full encryption. Source text: 115 characters. FSMs: Standard (27/4).
+  1000 runs: 2232.097 ms
+  Average time: 2.232 ms
+  Average length increase: x5.30
 
- Full decryption. Source text: 44 characters. FSM: Standard (27/4)
-  100 runs: 5918.435308999999 ms
-  Average time: 59.18435308999999 ms
+ Full decryption. Source text: 44 characters. FSMs: Standard (27/4).
+  100 runs: 5286.056 ms
+  Average time: 52.861 ms
 
- Full decryption. Source text: 116 characters. FSM: Standard (27/4)
-  100 runs: 71993.55851599999 ms
-  Average time: 719.9355851599998 ms
+ Full decryption. Source text: 116 characters. FSMs: Standard (27/4).
+  100 runs: 123407.593 ms
+  Average time: 1234.076 ms
+
+ Average language similarity. FSMs: Standard (27/4).
+  27 languages: 4.3%
 
   */
 
   return {
-    wordToWord,
-    wordToArray,
-    maxForWord,
-    bestPerWord,
-    maxForArray,
-    measureExecutionTime: addTiming,
     runAll,
   };
 })();
