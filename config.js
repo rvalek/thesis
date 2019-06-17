@@ -5,7 +5,7 @@ module.exports = {
   fsmAlphabet: `A${util.latinAlphabet}`,
   fsmStates: 4,
   fsmTransitionFillPercent: 35,
-  minCypherLengthPerSourceLetter: 3,
+  minCipherLengthPerSourceLetter: 3,
   fsmSavePath: './resources/fsms',
   logging: true,
 };
