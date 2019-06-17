@@ -1,6 +1,6 @@
 const words = require('./words');
 const config = require('../../config');
-const util = require('../util');
+const util = require('../tools/util');
 
 // TODO: does parity check actually word? -- I think it does
 

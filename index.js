@@ -1,6 +1,6 @@
 const top = require('./src/top');
 const crypt = require('./src/logic/crypt');
-const cli = require('./src/cli');
+const cli = require('./src/tools/cli');
 
 (() => {
   const keys = cli.newKeys ? top.makeKeys() : top.loadKeys();
