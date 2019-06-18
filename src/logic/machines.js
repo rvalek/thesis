@@ -61,30 +61,14 @@ module.exports = (() => {
     return fsm.acceptingStates.some(acceptingState => reachableStates.includes(acceptingState));
   };
 
-  const _acceptingCells = new Map([...config.fsmAlphabet].map(symbol => [symbol, 0]));
-  const _fsmsPerSymbol = Math.ceil(config.sourceAlphabet.length / config.fsmAlphabet.length);
-  const _selectAcceptingTransition = (transitions) => {
-    let t;
-    let timesUsed;
-
-    do {
-      t = util.getRandomElement(transitions);
-      timesUsed = _acceptingCells.get(t.symbol);
-    } while (timesUsed >= _fsmsPerSymbol);
-
-    _acceptingCells.set(t.symbol, timesUsed + 1);
-
-    return t;
-  };
-
-  const _generateSingle = (letter, alphabet, operationalStates) => {
+  const _generateSingle = (letter, alphabet, operationalStates, acceptingTransitionSelector = util.getRandomElement) => {
     let newFsm;
 
     do {
       newFsm = _createRandom(alphabet, operationalStates);
 
       // Chooses a cell that would point to the accepting state
-      const acceptingTransition = _selectAcceptingTransition(newFsm.transitions);
+      const acceptingTransition = acceptingTransitionSelector(newFsm.transitions);
       const acceptingCell = {
         symbol: acceptingTransition.symbol,
         state: acceptingTransition.fromState,
@@ -151,19 +135,36 @@ module.exports = (() => {
     .map(_makeHtmlTable)
     .join('</br>');
 
-  const generate = (letters = '', [...alphabet] = [], numStates = 0) => (letters.length === 0
-    ? _generateSingle(letters, alphabet, numStates) : [...letters].reduce(
+
+  const generate = (letters = config.sourceAlphabet, [...alphabet] = config.fsmAlphabet, numStates = config.fsmStates) => {
+    const usedSymbolCounter = new Map([...alphabet].map(symbol => [symbol, 0]));
+    const fsmsPerSymbol = Math.ceil(letters.length / alphabet.length);
+
+    const transitionSelector = (transitions) => {
+      let t;
+      let timesUsed;
+
+      do {
+        t = util.getRandomElement(transitions);
+        timesUsed = usedSymbolCounter.get(t.symbol);
+      } while (timesUsed > fsmsPerSymbol);
+
+      usedSymbolCounter.set(t.symbol, timesUsed + 1);
+
+      return t;
+    };
+
+    return [...letters].reduce(
       (acc, letter) => ({
-        [letter]: _generateSingle(letter, alphabet, numStates),
+        [letter]: _generateSingle(letter, alphabet, numStates, transitionSelector),
         ...acc,
       }), {},
-    ));
-
+    );
+  };
   // Internals are exposed for analysis
   return {
     generate,
     toHtml,
     _generateSingle,
-    _acceptingCells,
   };
 })();
