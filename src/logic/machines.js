@@ -63,21 +63,18 @@ module.exports = (() => {
 
   const _acceptingCells = new Map([...config.fsmAlphabet].map(symbol => [symbol, 0]));
   const _fsmsPerSymbol = Math.ceil(config.sourceAlphabet.length / config.fsmAlphabet.length);
-  const _selectAcceptingTransition = (fsm) => {
-    let symbol;
+  const _selectAcceptingTransition = (transitions) => {
+    let t;
     let timesUsed;
 
     do {
-      symbol = util.getRandomElement(fsm.alphabet);
-      timesUsed = _acceptingCells.get(symbol);
+      t = util.getRandomElement(transitions);
+      timesUsed = _acceptingCells.get(t.symbol);
     } while (timesUsed >= _fsmsPerSymbol);
 
-    _acceptingCells.set(symbol, timesUsed + 1);
+    _acceptingCells.set(t.symbol, timesUsed + 1);
 
-    return {
-      symbol,
-      state: util.getRandomElement(fsm.states),
-    };
+    return t;
   };
 
   const _generateSingle = (letter, alphabet, operationalStates) => {
@@ -87,7 +84,11 @@ module.exports = (() => {
       newFsm = _createRandom(alphabet, operationalStates);
 
       // Chooses a cell that would point to the accepting state
-      const acceptingCell = _selectAcceptingTransition(newFsm);
+      const acceptingTransition = _selectAcceptingTransition(newFsm.transitions);
+      const acceptingCell = {
+        symbol: acceptingTransition.symbol,
+        state: acceptingTransition.fromState,
+      };
       newFsm.acceptingCells = [acceptingCell];
 
       // Adds a state and makes it the only accepting one
@@ -97,20 +98,10 @@ module.exports = (() => {
 
       // Determines the transition from the chosen accepting cell
       // Points it to the accepting state
-      const acceptingTransition = newFsm.transitions.find(
+      newFsm.transitions.find(
         t => t.fromState === acceptingCell.state
         && t.symbol === acceptingCell.symbol,
-      );
-
-      if (acceptingTransition !== undefined) {
-        acceptingTransition.toStates = [newAccState];
-      } else {
-        newFsm.transitions.push({
-          fromState: acceptingCell.state,
-          symbol: acceptingCell.symbol,
-          toStates: [newAccState],
-        });
-      }
+      ).toStates = [newAccState];
     } while (!_isAcceptingStateReachable(newFsm));
 
     newFsm.ciphersLetter = letter;
