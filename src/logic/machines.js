@@ -63,18 +63,18 @@ module.exports = (() => {
 
   const _acceptingCells = new Map([...config.fsmAlphabet].map(symbol => [symbol, 0]));
   const _fsmsPerSymbol = Math.ceil(config.sourceAlphabet.length / config.fsmAlphabet.length);
-  const _selectAcceptingTransition = (transitions) => {
-    let t;
+  const _selectAcceptingTransition = (fsm) => {
+    let symbol;
     let timesUsed;
 
     do {
-      t = util.getRandomElement(transitions);
-      timesUsed = _acceptingCells.get(t.symbol);
+      symbol = util.getRandomElement(fsm.alphabet);
+      timesUsed = _acceptingCells.get(symbol);
     } while (timesUsed >= _fsmsPerSymbol);
 
-    _acceptingCells.set(t.symbol, timesUsed + 1);
+    _acceptingCells.set(symbol, timesUsed + 1);
 
-    return t;
+    return { symbol, state: util.getRandomElement(fsm.states) };
   };
 
   const _generateSingle = (letter, alphabet, operationalStates) => {
@@ -84,12 +84,12 @@ module.exports = (() => {
       newFsm = _createRandom(alphabet, operationalStates);
 
       // Chooses a cell that would point to the accepting state
-      // const randomTransition = util.getRandomElement(newFsm.transitions);
-      const acceptingTransition = _selectAcceptingTransition(newFsm.transitions);
-      const acceptingCell = {
-        state: acceptingTransition.fromState,
-        symbol: acceptingTransition.symbol,
-      };
+      // const acceptingTransition = util.getRandomElement(newFsm.transitions);
+      // const acceptingCell = {
+      //   state: acceptingTransition.fromState,
+      //   symbol: acceptingTransition.symbol,
+      // };
+      const acceptingCell = _selectAcceptingTransition(newFsm);
       newFsm.acceptingCells = [acceptingCell];
 
       // Adds a state and makes it the only accepting one
