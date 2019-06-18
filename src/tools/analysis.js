@@ -31,7 +31,10 @@ module.exports = (() => {
 
     let runningTotal = 0;
     for (let i = 0; i < times; i += 1) {
-      const { time, result } = timedFunc(...argGenerator());
+      const {
+        time,
+        result,
+      } = timedFunc(...argGenerator());
 
       runningTotal += time;
 
@@ -179,13 +182,13 @@ module.exports = (() => {
   const languageSimilarity = () => {
     const keys = machines.generate(...defaultKeysConfig);
     const stringPerLanguge = Object.values(keys).map(fsm => util.generateArray(() => words._generateBalanced(fsm), 100).join(''));
-    const corsPerLanguage = stringPerLanguge.map((str, i) => stringPerLanguge.reduce((acc, next, j) => j !== i ? [...acc, strSim.compareTwoStrings(str, next)] : acc, []));
+    const corsPerLanguage = stringPerLanguge.map((str, i) => stringPerLanguge.reduce((acc, next, j) => (j !== i ? [...acc, strSim.compareTwoStrings(str, next)] : acc), []));
     const avgCorPerLanguage = corsPerLanguage.map(cors => cors.reduce((acc, next) => acc + next) / cors.length);
     const totalAverage = avgCorPerLanguage.reduce((acc, next) => acc + next) / avgCorPerLanguage.length;
 
-    console.log('\n', 'Average language similarity.','FSMs: Standard (27/4).');
+    console.log('\n', 'Average language similarity.', 'FSMs: Standard (27/4).');
     console.log(`  27 languages: ${totalAverage.toFixed(3) * 100}%`);
-  }
+  };
 
   const runAll = () => {
     console.log('ALL METRICS:');

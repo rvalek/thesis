@@ -13,6 +13,7 @@ module.exports = (() => {
 
     if (config.logging) {
       util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
+      console.log('Last symbol usage:\n', machines._acceptingCells);
     }
 
     return keys;

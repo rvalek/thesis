@@ -7,13 +7,13 @@ module.exports = (FSMs) => {
   const oddCheckLetter = config.sourceAlphabet[1];
 
   const _generateParityCipher = (sourceText, minLengthPerLetter) => words.generate(
-      FSMs[util.isLengthEven(sourceText) ? evenCheckLetter : oddCheckLetter],
-      minLengthPerLetter,
-    );
+    FSMs[util.isLengthEven(sourceText) ? evenCheckLetter : oddCheckLetter],
+    minLengthPerLetter,
+  );
 
   const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === evenCheckLetter
-      ? !util.isLengthEven(decryptedText)
-      : util.isLengthEven(decryptedText));
+    ? !util.isLengthEven(decryptedText)
+    : util.isLengthEven(decryptedText));
 
   const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
 
@@ -33,9 +33,7 @@ module.exports = (FSMs) => {
     }
 
     for (
-      let suffixLength = minSuffixLength, acceptingFSM, word;
-      suffixLength >= -subCipher.length;
-      suffixLength -= 1
+      let suffixLength = minSuffixLength, acceptingFSM, word; suffixLength >= -subCipher.length; suffixLength -= 1
     ) {
       word = subCipher.slice(suffixLength);
       acceptingFSM = possibleFSMs.find(_acceptsWord(word));
@@ -49,7 +47,10 @@ module.exports = (FSMs) => {
           console.log(` Deciphered ${word} as ${acceptingFSM.ciphersLetter}`);
         }
 
-        return { decipheredLetter: acceptingFSM.ciphersLetter, suffixLength };
+        return {
+          decipheredLetter: acceptingFSM.ciphersLetter,
+          suffixLength,
+        };
       }
     }
 
@@ -114,11 +115,11 @@ module.exports = (FSMs) => {
 
   // Produces a cipher string for a given source string.
   const encrypt = (
-    [...sourceText],
-    minLengthPerLetter = config.minCipherLengthPerSourceLetter,
-  ) => sourceText
-      .map(letter => words.generate(FSMs[letter], minLengthPerLetter))
-      .join('') + _generateParityCipher(sourceText, minLengthPerLetter);
+      [...sourceText],
+      minLengthPerLetter = config.minCipherLengthPerSourceLetter,
+    ) => sourceText
+    .map(letter => words.generate(FSMs[letter], minLengthPerLetter))
+    .join('') + _generateParityCipher(sourceText, minLengthPerLetter);
 
   return {
     encrypt,

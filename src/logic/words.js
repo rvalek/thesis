@@ -1,19 +1,21 @@
-const { logging } = require('../../config');
+const {
+  logging,
+} = require('../../config');
 const util = require('../tools/util');
 
 module.exports = (() => {
   // Produces a set of target states from given states and a symbol.
   const _makeTransition = (fsm, fromStates, symbol) => new Set(
-      fsm.transitions
-        .filter(t => t.symbol === symbol && fromStates.includes(t.fromState))
-        .flatMap(t => t.toStates),
-    );
+    fsm.transitions
+    .filter(t => t.symbol === symbol && fromStates.includes(t.fromState))
+    .flatMap(t => t.toStates),
+  );
 
   // Produces the resulting state of a given machine after reading a string.
   const _readString = (fsm, [...inputString]) => inputString.reduce(
-      (accStates, symbol) => [..._makeTransition(fsm, accStates, symbol)],
-      [fsm.initialState],
-    );
+    (accStates, symbol) => [..._makeTransition(fsm, accStates, symbol)],
+    [fsm.initialState],
+  );
 
   // Produces a random word of certain minimal length, accepted by a given machine.
   const _generateSingle = (fsm, minLength) => {
@@ -28,7 +30,10 @@ module.exports = (() => {
         break;
       }
 
-      const { symbol, fromState } = util.getRandomElement(transitions);
+      const {
+        symbol,
+        fromState,
+      } = util.getRandomElement(transitions);
       trail.push(symbol);
       currentState = fromState;
     }

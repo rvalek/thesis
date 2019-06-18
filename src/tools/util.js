@@ -1,5 +1,7 @@
 const fs = require('fs');
-const { logging } = require('../../config');
+const {
+  logging,
+} = require('../../config');
 
 module.exports = (() => {
   const latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -44,8 +46,8 @@ module.exports = (() => {
   };
 
   const generateArray = (producer, length) => Array(length)
-      .fill()
-      .map(producer);
+    .fill()
+    .map(producer);
 
   const shuffle = ([...a]) => {
     for (let i = a.length - 1; i > 0; i -= 1) {
@@ -59,19 +61,25 @@ module.exports = (() => {
 
   const asHalves = ([...a]) => {
     const middleIndex = Math.floor(a.length / 2);
-    return { left: a.slice(0, middleIndex), right: a.slice(middleIndex) };
+    return {
+      left: a.slice(0, middleIndex),
+      right: a.slice(middleIndex),
+    };
   };
 
-  const _imbalanceCount = ([...word], { left, right }) => word.reduce((counter, char) => {
-      if (left.includes(char)) {
-        return counter + 1;
-      }
-      if (right.includes(char)) {
-        return counter - 1;
-      }
+  const _imbalanceCount = ([...word], {
+    left,
+    right,
+  }) => word.reduce((counter, char) => {
+    if (left.includes(char)) {
+      return counter + 1;
+    }
+    if (right.includes(char)) {
+      return counter - 1;
+    }
 
-      return counter;
-    }, 0);
+    return counter;
+  }, 0);
 
   const isBalanced = (word, halves, tolerance = 1) => Math.abs(_imbalanceCount(word, halves)) <= tolerance;
 
@@ -84,7 +92,10 @@ module.exports = (() => {
 
     const [seconds, nanos] = process.hrtime(time);
 
-    return { result, time: seconds * _microsInSec + nanos / _nanosInMicro };
+    return {
+      result,
+      time: seconds * _microsInSec + nanos / _nanosInMicro,
+    };
   };
 
   return {
