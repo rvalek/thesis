@@ -59,7 +59,7 @@ module.exports = (() => {
     _measureExecutionTime(
       machines._generateSingle,
       () => defaultFsmConfig,
-      ['FSM Generation.', 'Alpbabet length: 27.', 'Operational states: 4.'],
+      ['FSM Generation.', 'Alphabet length: 27.', 'Operational states: 4.'],
       times,
     );
   };
@@ -73,7 +73,7 @@ module.exports = (() => {
     _measureExecutionTime(
       machines._generateSingle,
       () => args,
-      ['FSM Generation.', 'Alpbabet length: 52.', 'Operational states: 8.'],
+      ['FSM Generation.', 'Alphabet length: 52.', 'Operational states: 8.'],
       times,
     );
   };
@@ -210,45 +210,44 @@ module.exports = (() => {
 
   /*
 
-Roberts-MacBook-Pro-2:thesis robertvalek$ node index.js node index.js -a
 ALL METRICS:
 
- FSM Generation. Alpbabet length: 27. Operational states: 4.
-  1000 runs: 54.124 ms
-  Average time: 0.054 ms
+ FSM Generation. Alphabet length: 27. Operational states: 4.
+  1000 runs: 109.078 ms
+  Average time: 0.109 ms
 
- FSM Generation. Alpbabet length: 52. Operational states: 8.
-  1000 runs: 217.960 ms
-  Average time: 0.218 ms
+ FSM Generation. Alphabet length: 52. Operational states: 8.
+  1000 runs: 343.742 ms
+  Average time: 0.344 ms
 
  Cipher generation. Single letter. Balancing: OFF. FSM: Standard (27/4).
-  1000 runs: 19.131 ms
-  Average time: 0.019 ms
+  1000 runs: 39.806 ms
+  Average time: 0.040 ms
 
  Cipher generation. Single letter. Balancing: ON. FSM: Standard (27/4).
-  1000 runs: 28.069 ms
-  Average time: 0.028 ms
+  1000 runs: 23.026 ms
+  Average time: 0.023 ms
 
  Full encryption. Source text: 43 characters. FSMs: Standard (27/4).
-  1000 runs: 1009.861 ms
-  Average time: 1.010 ms
-  Average length increase: x5.71
+  1000 runs: 1576.103 ms
+  Average time: 1.576 ms
+  Average length increase: x5.66
 
  Full encryption. Source text: 115 characters. FSMs: Standard (27/4).
-  1000 runs: 2232.097 ms
-  Average time: 2.232 ms
-  Average length increase: x5.30
+  1000 runs: 3260.300 ms
+  Average time: 3.260 ms
+  Average length increase: x4.95
 
  Full decryption. Source text: 43 characters. FSMs: Standard (27/4).
-  100 runs: 5286.056 ms
-  Average time: 52.861 ms
+  100 runs: 8090.241 ms
+  Average time: 80.902 ms
 
  Full decryption. Source text: 115 characters. FSMs: Standard (27/4).
-  100 runs: 123407.593 ms
-  Average time: 1234.076 ms
+  100 runs: 163014.193 ms
+  Average time: 1630.142 ms
 
  Average language similarity. FSMs: Standard (27/4).
-  27 languages: 4.3%
+  27 languages: 3.5%
 
   */
 
