@@ -135,28 +135,27 @@ module.exports = (() => {
     .map(_makeHtmlTable)
     .join('</br>');
 
+  const _transitionSelector = (usedSymbolCounter, fsmsPerSymbol) => (transitions) => {
+    let t;
+    let timesUsed;
+
+    do {
+      t = util.getRandomElement(transitions);
+      timesUsed = usedSymbolCounter.get(t.symbol);
+    } while (timesUsed > fsmsPerSymbol);
+
+    usedSymbolCounter.set(t.symbol, timesUsed + 1);
+
+    return t;
+  };
 
   const generate = (letters = config.sourceAlphabet, [...alphabet] = config.fsmAlphabet, numStates = config.fsmStates) => {
-    const usedSymbolCounter = new Map([...alphabet].map(symbol => [symbol, 0]));
+    const symbolCounter = new Map([...alphabet].map(symbol => [symbol, 0]));
     const fsmsPerSymbol = Math.ceil(letters.length / alphabet.length);
-
-    const transitionSelector = (transitions) => {
-      let t;
-      let timesUsed;
-
-      do {
-        t = util.getRandomElement(transitions);
-        timesUsed = usedSymbolCounter.get(t.symbol);
-      } while (timesUsed > fsmsPerSymbol);
-
-      usedSymbolCounter.set(t.symbol, timesUsed + 1);
-
-      return t;
-    };
 
     return [...letters].reduce(
       (acc, letter) => ({
-        [letter]: _generateSingle(letter, alphabet, numStates, transitionSelector),
+        [letter]: _generateSingle(letter, alphabet, numStates, _transitionSelector(symbolCounter, fsmsPerSymbol)),
         ...acc,
       }), {},
     );
