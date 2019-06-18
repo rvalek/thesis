@@ -1,7 +1,5 @@
 const fs = require('fs');
-const {
-  logging,
-} = require('../../config');
+const config = require('../../config');
 
 module.exports = (() => {
   const latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -28,8 +26,12 @@ module.exports = (() => {
     }
 
     fs.writeFile(toPath, data, (err) => {
-      if (logging) {
-        console.log(err || `Wrote ${toPath}`);
+      if (err) {
+        console.log(err);
+        return;
+      }
+      if (config.logging) {
+        console.log(`Wrote ${toPath}`);
       }
     });
   };

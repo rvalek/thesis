@@ -74,7 +74,10 @@ module.exports = (() => {
 
     _acceptingCells.set(symbol, timesUsed + 1);
 
-    return { symbol, state: util.getRandomElement(fsm.states) };
+    return {
+      symbol,
+      state: util.getRandomElement(fsm.states),
+    };
   };
 
   const _generateSingle = (letter, alphabet, operationalStates) => {
@@ -84,11 +87,6 @@ module.exports = (() => {
       newFsm = _createRandom(alphabet, operationalStates);
 
       // Chooses a cell that would point to the accepting state
-      // const acceptingTransition = util.getRandomElement(newFsm.transitions);
-      // const acceptingCell = {
-      //   state: acceptingTransition.fromState,
-      //   symbol: acceptingTransition.symbol,
-      // };
       const acceptingCell = _selectAcceptingTransition(newFsm);
       newFsm.acceptingCells = [acceptingCell];
 
@@ -99,10 +97,20 @@ module.exports = (() => {
 
       // Determines the transition from the chosen accepting cell
       // Points it to the accepting state
-      newFsm.transitions.find(
+      const acceptingTransition = newFsm.transitions.find(
         t => t.fromState === acceptingCell.state
         && t.symbol === acceptingCell.symbol,
-      ).toStates = [newAccState];
+      );
+
+      if (acceptingTransition !== undefined) {
+        acceptingTransition.toStates = [newAccState];
+      } else {
+        newFsm.transitions.push({
+          fromState: acceptingCell.state,
+          symbol: acceptingCell.symbol,
+          toStates: [newAccState],
+        });
+      }
     } while (!_isAcceptingStateReachable(newFsm));
 
     newFsm.ciphersLetter = letter;
