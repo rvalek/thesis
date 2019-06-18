@@ -160,6 +160,7 @@ module.exports = (() => {
       }), {},
     );
   };
+
   // Internals are exposed for analysis
   return {
     generate,

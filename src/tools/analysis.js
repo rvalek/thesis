@@ -187,7 +187,7 @@ module.exports = (() => {
     const totalAverage = avgCorPerLanguage.reduce((acc, next) => acc + next) / avgCorPerLanguage.length;
 
     console.log('\n', 'Average language similarity.', 'FSMs: Standard (27/4).');
-    console.log(`  27 languages: ${totalAverage.toFixed(3) * 100}%`);
+    console.log(`  27 languages: ${(totalAverage * 100).toFixed(3)}%`);
   };
 
   const runAll = () => {
