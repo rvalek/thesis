@@ -157,7 +157,7 @@ module.exports = (() => {
       () => [system.encrypt(_pangram, 3), 3],
       [
         'Full decryption.',
-        'Source text: 44 characters.',
+        'Source text: 43 characters.',
         'FSMs: Standard (27/4).',
       ],
       times,
@@ -172,7 +172,7 @@ module.exports = (() => {
       () => [system.encrypt(_lorem, 3), 3],
       [
         'Full decryption.',
-        'Source text: 116 characters.',
+        'Source text: 115 characters.',
         'FSMs: Standard (27/4).',
       ],
       times,
@@ -239,11 +239,11 @@ ALL METRICS:
   Average time: 2.232 ms
   Average length increase: x5.30
 
- Full decryption. Source text: 44 characters. FSMs: Standard (27/4).
+ Full decryption. Source text: 43 characters. FSMs: Standard (27/4).
   100 runs: 5286.056 ms
   Average time: 52.861 ms
 
- Full decryption. Source text: 116 characters. FSMs: Standard (27/4).
+ Full decryption. Source text: 115 characters. FSMs: Standard (27/4).
   100 runs: 123407.593 ms
   Average time: 1234.076 ms
 
