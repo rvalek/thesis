@@ -1,4 +1,5 @@
 const config = require('../config');
+const crypt = require('./logic/crypt');
 const machines = require('./logic/machines');
 const util = require('./tools/util');
 
@@ -54,5 +55,6 @@ module.exports = (() => {
     loadKeys,
     decrypt,
     encrypt,
+    system: crypt,
   };
 })();
