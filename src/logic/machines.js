@@ -21,15 +21,13 @@ module.exports = (() => {
       util.generateArray((_, i) => `s${i}`, numStates),
     );
 
-    const selectTargetState = () => (Math.round(Math.random() <= transitionFillPercent / 100)
-        ? [util.getRandomElement(newFsm.states)]
-        : []);
+    const selectTargetState = () => (Math.round(Math.random() <= transitionFillPercent / 100) ? [util.getRandomElement(newFsm.states)] : []);
 
     newFsm.transitions = newFsm.states.flatMap(fromState => newFsm.alphabet.map(symbol => ({
-        fromState,
-        symbol,
-        toStates: selectTargetState(),
-      })));
+      fromState,
+      symbol,
+      toStates: selectTargetState(),
+    })));
 
     return newFsm;
   };
@@ -63,6 +61,22 @@ module.exports = (() => {
     return fsm.acceptingStates.some(acceptingState => reachableStates.includes(acceptingState));
   };
 
+  const _acceptingCells = new Map([...config.fsmAlphabet].map(symbol => [symbol, 0]));
+  const _fsmsPerSymbol = Math.ceil(config.sourceAlphabet.length / config.fsmAlphabet.length);
+  const _selectAcceptingTransition = (transitions) => {
+    let t;
+    let timesUsed;
+
+    do {
+      t = util.getRandomElement(transitions);
+      timesUsed = _acceptingCells.get(t.symbol);
+    } while (timesUsed >= _fsmsPerSymbol);
+
+    _acceptingCells.set(t.symbol, timesUsed + 1);
+
+    return t;
+  };
+
   const _generateSingle = (letter, alphabet, operationalStates) => {
     let newFsm;
 
@@ -70,24 +84,25 @@ module.exports = (() => {
       newFsm = _createRandom(alphabet, operationalStates);
 
       // Chooses a cell that would point to the accepting state
-      const randomTransition = util.getRandomElement(newFsm.transitions);
+      // const randomTransition = util.getRandomElement(newFsm.transitions);
+      const acceptingTransition = _selectAcceptingTransition(newFsm.transitions);
       const acceptingCell = {
-        state: randomTransition.fromState,
-        symbol: randomTransition.symbol,
+        state: acceptingTransition.fromState,
+        symbol: acceptingTransition.symbol,
       };
       newFsm.acceptingCells = [acceptingCell];
 
       // Adds a state and makes it the only accepting one
-      const newStateName = 'sX';
-      newFsm.states.push(newStateName);
-      newFsm.acceptingStates = [newStateName];
+      const newAccState = 'sX';
+      newFsm.states.push(newAccState);
+      newFsm.acceptingStates = [newAccState];
 
       // Determines the transition from the chosen accepting cell
       // Points it to the accepting state
       newFsm.transitions.find(
         t => t.fromState === acceptingCell.state
-          && t.symbol === acceptingCell.symbol,
-      ).toStates = [newStateName];
+        && t.symbol === acceptingCell.symbol,
+      ).toStates = [newAccState];
     } while (!_isAcceptingStateReachable(newFsm));
 
     newFsm.ciphersLetter = letter;
@@ -102,8 +117,8 @@ module.exports = (() => {
     const tableRows = fsm.states.map(state => [
       state,
       ...fsm.alphabet.map(symbol => fsm.transitions
-          .filter(t => t.fromState === state && t.symbol === symbol)
-          .map(t => t.toStates)),
+        .filter(t => t.fromState === state && t.symbol === symbol)
+        .map(t => t.toStates)),
       fsm.acceptingStates.includes(state) ? ['1'] : ['0'],
     ]);
 
@@ -134,19 +149,22 @@ module.exports = (() => {
   };
 
   const toHtml = FSMs => Object.values(FSMs)
-      .map(_makeHtmlTable)
-      .join('</br>');
+    .map(_makeHtmlTable)
+    .join('</br>');
 
   const generate = (letters = '', [...alphabet] = [], numStates = 0) => (letters.length === 0
-      ? _generateSingle(letters, alphabet, numStates)
-      : [...letters].reduce(
-          (acc, letter) => ({
-            [letter]: _generateSingle(letter, alphabet, numStates),
-            ...acc,
-          }),
-          {},
-        ));
+    ? _generateSingle(letters, alphabet, numStates) : [...letters].reduce(
+      (acc, letter) => ({
+        [letter]: _generateSingle(letter, alphabet, numStates),
+        ...acc,
+      }), {},
+    ));
 
   // Internals are exposed for analysis
-  return { generate, toHtml, _generateSingle };
+  return {
+    generate,
+    toHtml,
+    _generateSingle,
+    _acceptingCells,
+  };
 })();
