@@ -1,5 +1,5 @@
 const fs = require('fs');
-const config = require('../../config');
+const { logging } = require('../../config');
 
 module.exports = (() => {
   const latinAlphabet = 'abcdefghijklmnopqrstuvwxyz';
@@ -13,7 +13,7 @@ module.exports = (() => {
   // Validates provided source text against supported encryption alphabet.
   const matchesAlphabet = (word, alphabet) => {
     if (![...word].every(char => alphabet.includes(char))) {
-      throw Error(`Word "${word}" does not match alphabet: ${alphabet}`);
+      throw Error(`Word ${word} does not match alphabet: ${alphabet}`);
     }
     return word;
   };
@@ -30,7 +30,8 @@ module.exports = (() => {
         console.log(err);
         return;
       }
-      if (config.logging) {
+
+      if (logging) {
         console.log(`Wrote ${toPath}`);
       }
     });

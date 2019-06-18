@@ -1,4 +1,4 @@
-const config = require('../../config');
+const { logging } = require('../../config');
 const util = require('../tools/util');
 
 module.exports = (() => {
@@ -38,7 +38,7 @@ module.exports = (() => {
 
     const word = trail.reverse().join('');
 
-    if (config.logging) {
+    if (logging) {
       console.log(` Generated ${word} for ${fsm.ciphersLetter}`);
     }
 
@@ -53,7 +53,7 @@ module.exports = (() => {
       word = _generateSingle(fsm, minLength);
     } while (!util.isBalanced(word, fsm.balancing));
 
-    if (config.logging) {
+    if (logging) {
       console.log(
         `Accepted balanced ${word} for ${fsm.ciphersLetter}, with L: ${
           fsm.balancing.left

@@ -1,8 +1,6 @@
-const util = require('./src/tools/util');
-
 module.exports = {
-  sourceAlphabet: ` ${util.latinAlphabet}`,
-  fsmAlphabet: `A${util.latinAlphabet}`,
+  sourceAlphabet: ' abcdefghijklmnopqrstuvwxyz',
+  fsmAlphabet: 'Aabcdefghijklmnopqrstuvwxyz',
   fsmStates: 4,
   fsmTransitionFillPercent: 35,
   minCipherLengthPerSourceLetter: 3,
