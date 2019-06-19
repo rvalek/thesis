@@ -45,7 +45,7 @@ module.exports = (() => {
     return word;
   };
 
-  // _generateSingle that is balanced
+  // _generateSingle that is accepted by the balancing gramar
   const _generateBalanced = (fsm, minLength) => {
     let word;
 
@@ -64,7 +64,6 @@ module.exports = (() => {
     return word;
   };
 
-  // Produces requested number of random string, accepted by a given machine.
   const generate = (fsm, minLength = 1) => _generateBalanced(fsm, minLength);
 
   // A predicate of whether reading a given word results in accepting state by a machine.

@@ -16,7 +16,6 @@ module.exports = (FSMs) => {
     : util.isLengthEven(decryptedText));
 
   const _acceptsWord = word => fsm => words.isAccepted(fsm, word);
-
   const _fsmsWithTeminatingSymbol = letter => Object.values(FSMs).filter(fsm => fsm.acceptingCells.some(cell => cell.symbol === letter));
 
   const _decipherSuffix = (subCipher, minSuffixLength) => {
