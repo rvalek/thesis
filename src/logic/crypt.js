@@ -2,13 +2,15 @@ const words = require('./words');
 const config = require('../../config');
 const util = require('../tools/util');
 
-module.exports = (FSMs, pregeneratedWords = null, minLengthPerLetter = config.minCipherLengthPerSourceLetter) => {
-  const _GEN_WORDS_PER_CYCLE = 100;
-  const _genWords = (fsm, numberOfWords) => util.generateArray(() => words.generate(fsm, minLengthPerLetter), numberOfWords);
+module.exports = (FSMs, pregeneratedWords = null) => {
+  const _generateWordsPerCycle = config.generateWordsPerCycle;
+  const _minLengthPerLetter = config.minCipherLengthPerSourceLetter;
+
+  const _genWords = (fsm, numberOfWords) => util.generateArray(() => words.generate(fsm, _minLengthPerLetter), numberOfWords);
 
   const wordStore = pregeneratedWords || Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
     ...acc,
-    [letter]: _genWords(fsm, _GEN_WORDS_PER_CYCLE),
+    [letter]: _genWords(fsm, _generateWordsPerCycle),
   }), {});
 
   const _nextWordForLetter = (letter) => {
@@ -17,7 +19,7 @@ module.exports = (FSMs, pregeneratedWords = null, minLengthPerLetter = config.mi
         console.log(`Ran out of ciphers for '${letter}'. Generating new words.`);
       }
 
-      wordStore[letter] = _genWords(FSMs[letter], _GEN_WORDS_PER_CYCLE);
+      wordStore[letter] = _genWords(FSMs[letter], _generateWordsPerCycle);
     }
 
     const cipher = wordStore[letter].pop();
@@ -81,7 +83,7 @@ module.exports = (FSMs, pregeneratedWords = null, minLengthPerLetter = config.mi
   const decrypt = (cipher) => {
     let remainingCipher = cipher;
     let deciphered = '';
-    let suffixLength = -minLengthPerLetter;
+    let suffixLength = -_minLengthPerLetter;
     const continuationPoints = [];
 
     let found;
