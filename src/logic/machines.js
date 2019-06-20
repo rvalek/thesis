@@ -61,6 +61,19 @@ module.exports = (() => {
     return fsm.acceptingStates.some(acceptingState => reachableStates.includes(acceptingState));
   };
 
+  const _makeBalancingRule = (fsm) => {
+    const randomRule = util.asHalves(util.shuffle(fsm.alphabet));
+    const [{ symbol }] = fsm.acceptingCells;
+
+    const x = randomRule.left.indexOf(symbol);
+    if (x !== -1) {
+      randomRule.left.splice(x, 1);
+      randomRule.right.unshift(symbol);
+    }
+
+    return randomRule;
+  };
+
   const _generateSingle = (letter, alphabet, operationalStates, acceptingTransitionSelector = util.getRandomElement) => {
     let newFsm;
 
@@ -88,8 +101,9 @@ module.exports = (() => {
       ).toStates = [newAccState];
     } while (!_isAcceptingStateReachable(newFsm));
 
+    newFsm.balancing = _makeBalancingRule(newFsm);
+
     newFsm.ciphersLetter = letter;
-    newFsm.balancing = util.asHalves(util.shuffle(newFsm.alphabet));
 
     return newFsm;
   };

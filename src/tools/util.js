@@ -70,22 +70,6 @@ module.exports = (() => {
     };
   };
 
-  const _imbalanceCount = ([...word], {
-    left,
-    right,
-  }) => word.reduce((counter, char) => {
-    if (left.includes(char)) {
-      return counter + 1;
-    }
-    if (right.includes(char)) {
-      return counter - 1;
-    }
-
-    return counter;
-  }, 0);
-
-  const isBalanced = (word, halves, tolerance = 1) => Math.abs(_imbalanceCount(word, halves)) <= tolerance;
-
   const _microsInSec = 1e3;
   const _nanosInMicro = 1e6;
   const addTiming = func => (...args) => {
@@ -112,7 +96,6 @@ module.exports = (() => {
     generateArray,
     shuffle,
     asHalves,
-    isBalanced,
     addTiming,
   };
 })();

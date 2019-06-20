@@ -1,3 +1,4 @@
+const balance = require('./balance');
 const { logging } = require('../../config');
 const util = require('../tools/util');
 
@@ -51,7 +52,7 @@ module.exports = (() => {
 
     do {
       word = _generateSingle(fsm, minLength);
-    } while (!util.isBalanced(word, fsm.balancing));
+    } while (!util.isLengthEven(word) || !balance.isBalanced(word, fsm.balancing));
 
     if (logging) {
       console.log(
@@ -68,7 +69,7 @@ module.exports = (() => {
 
   // A predicate of whether reading a given word results in accepting state by a machine.
   const isAccepted = (fsm, word) => _readString(fsm, word).some(state => fsm.acceptingStates.includes(state))
-    && util.isBalanced(word, fsm.balancing);
+    && balance.isBalanced(word, fsm.balancing);
 
   // Internals are exposed for analysis
   return {
