@@ -63,7 +63,9 @@ module.exports = (() => {
 
   const _makeBalancingRule = (fsm) => {
     const randomRule = util.asHalves(util.shuffle(fsm.alphabet));
-    const [{ symbol }] = fsm.acceptingCells;
+    const [{
+      symbol,
+    }] = fsm.acceptingCells;
 
     const x = randomRule.left.indexOf(symbol);
     if (x !== -1) {
@@ -169,8 +171,8 @@ module.exports = (() => {
 
     return [...letters].reduce(
       (acc, letter) => ({
-        [letter]: _generateSingle(letter, alphabet, numStates, _transitionSelector(symbolCounter, fsmsPerSymbol)),
         ...acc,
+        [letter]: _generateSingle(letter, alphabet, numStates, _transitionSelector(symbolCounter, fsmsPerSymbol)),
       }), {},
     );
   };

@@ -2,16 +2,39 @@ const words = require('./words');
 const config = require('../../config');
 const util = require('../tools/util');
 
-module.exports = (FSMs) => {
-  const evenCheckLetter = config.sourceAlphabet[0];
-  const oddCheckLetter = config.sourceAlphabet[1];
+module.exports = (FSMs, minLengthPerLetter = config.minCipherLengthPerSourceLetter) => {
+  const _GEN_WORDS_PER_CYCLE = 100;
+  const _genWords = (fsm, numberOfWords) => util.generateArray(() => words.generate(fsm, minLengthPerLetter), numberOfWords);
+  const _wordStore = Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
+    ...acc,
+    [letter]: _genWords(fsm, _GEN_WORDS_PER_CYCLE),
+  }), {});
 
-  const _generateParityCipher = (sourceText, minLengthPerLetter) => words.generate(
-    FSMs[util.isLengthEven(sourceText) ? evenCheckLetter : oddCheckLetter],
+  const _nextWordForLetter = (letter) => {
+    if (_wordStore[letter].length === 0) {
+      if (config.logging) {
+        console.log(`Ran out of ciphers for '${letter}'. Generating new words.`);
+      }
+
+      _wordStore[letter] = _genWords(FSMs[letter], _GEN_WORDS_PER_CYCLE);
+    }
+
+    const cipher = _wordStore[letter].pop();
+
+    console.log(`Chose '${cipher}' for '${letter}'.`);
+
+    return cipher;
+  };
+
+  const _evenCheckLetter = config.sourceAlphabet[0];
+  const _oddCheckLetter = config.sourceAlphabet[1];
+
+  const _generateParityCipher = sourceText => words.generate(
+    FSMs[util.isLengthEven(sourceText) ? _evenCheckLetter : _oddCheckLetter],
     minLengthPerLetter,
   );
 
-  const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === evenCheckLetter
+  const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === _evenCheckLetter
     ? !util.isLengthEven(decryptedText)
     : util.isLengthEven(decryptedText));
 
@@ -57,10 +80,7 @@ module.exports = (FSMs) => {
   };
 
   // Attempts to recover source text from a given cipher.
-  const decrypt = (
-    cipher,
-    minLengthPerLetter = config.minCipherLengthPerSourceLetter,
-  ) => {
+  const decrypt = (cipher) => {
     let remainingCipher = cipher;
     let deciphered = '';
     let suffixLength = -minLengthPerLetter;
@@ -113,12 +133,10 @@ module.exports = (FSMs) => {
   };
 
   // Produces a cipher string for a given source string.
-  const encrypt = (
-      [...sourceText],
-      minLengthPerLetter = config.minCipherLengthPerSourceLetter,
-    ) => sourceText
-    .map(letter => words.generate(FSMs[letter], minLengthPerLetter))
-    .join('') + _generateParityCipher(sourceText, minLengthPerLetter);
+  const encrypt = ([...sourceText]) => sourceText
+    .map(letter => _nextWordForLetter(letter))
+    .join('') + _generateParityCipher(sourceText);
+
 
   return {
     encrypt,
