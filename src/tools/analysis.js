@@ -199,11 +199,11 @@ module.exports = (() => {
     cipherLetter(1000);
     cipherLetterBalanced(1000);
 
-    encryptText(1000);
-    encryptTextBig(1000);
+    // encryptText(1000);
+    // encryptTextBig(1000);
 
-    decryptText(100);
-    decryptTextBig(100);
+    // decryptText(100);
+    // decryptTextBig(100);
 
     languageSimilarity();
   };

@@ -2,24 +2,25 @@ const words = require('./words');
 const config = require('../../config');
 const util = require('../tools/util');
 
-module.exports = (FSMs, minLengthPerLetter = config.minCipherLengthPerSourceLetter) => {
+module.exports = (FSMs, pregeneratedWords = null, minLengthPerLetter = config.minCipherLengthPerSourceLetter) => {
   const _GEN_WORDS_PER_CYCLE = 100;
   const _genWords = (fsm, numberOfWords) => util.generateArray(() => words.generate(fsm, minLengthPerLetter), numberOfWords);
-  const _wordStore = Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
+
+  const wordStore = pregeneratedWords || Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
     ...acc,
     [letter]: _genWords(fsm, _GEN_WORDS_PER_CYCLE),
   }), {});
 
   const _nextWordForLetter = (letter) => {
-    if (_wordStore[letter].length === 0) {
+    if (wordStore[letter].length === 0) {
       if (config.logging) {
         console.log(`Ran out of ciphers for '${letter}'. Generating new words.`);
       }
 
-      _wordStore[letter] = _genWords(FSMs[letter], _GEN_WORDS_PER_CYCLE);
+      wordStore[letter] = _genWords(FSMs[letter], _GEN_WORDS_PER_CYCLE);
     }
 
-    const cipher = _wordStore[letter].pop();
+    const cipher = wordStore[letter].pop();
 
     console.log(`Chose '${cipher}' for '${letter}'.`);
 
@@ -29,10 +30,7 @@ module.exports = (FSMs, minLengthPerLetter = config.minCipherLengthPerSourceLett
   const _evenCheckLetter = config.sourceAlphabet[0];
   const _oddCheckLetter = config.sourceAlphabet[1];
 
-  const _generateParityCipher = sourceText => words.generate(
-    FSMs[util.isLengthEven(sourceText) ? _evenCheckLetter : _oddCheckLetter],
-    minLengthPerLetter,
-  );
+  const _generateParityCipher = sourceText => _nextWordForLetter(util.isLengthEven(sourceText) ? _evenCheckLetter : _oddCheckLetter);
 
   const _checkDecryptedParity = decryptedText => (decryptedText.slice(-1) === _evenCheckLetter
     ? !util.isLengthEven(decryptedText)
@@ -137,9 +135,10 @@ module.exports = (FSMs, minLengthPerLetter = config.minCipherLengthPerSourceLett
     .map(letter => _nextWordForLetter(letter))
     .join('') + _generateParityCipher(sourceText);
 
-
   return {
     encrypt,
     decrypt,
+    wordStore,
+    FSMs,
   };
 };

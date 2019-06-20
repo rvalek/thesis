@@ -2,8 +2,8 @@ module.exports = {
   sourceAlphabet: ' abcdefghijklmnopqrstuvwxyz',
   fsmAlphabet: 'Aabcdefghijklmnopqrstuvwxyz',
   fsmStates: 4,
-  fsmTransitionFillPercent: 70,
+  fsmTransitionFillPercent: 60,
   minCipherLengthPerSourceLetter: 3,
-  fsmSavePath: './resources/fsms',
+  keysSavePath: './resources/keys',
   logging: true,
 };

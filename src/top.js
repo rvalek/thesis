@@ -4,35 +4,42 @@ const machines = require('./logic/machines');
 const util = require('./tools/util');
 
 module.exports = (() => {
-  const makeKeys = () => {
-    const keys = machines.generate(
+  const newKeys = () => {
+    const system = crypt(machines.generate(
       config.sourceAlphabet,
       config.fsmAlphabet,
       config.fsmStates,
-    );
-    util.writeJSON(config.fsmSavePath, keys);
+    ));
+
+    util.writeJSON(config.keysSavePath, system);
 
     if (config.logging) {
-      util.writeHTML(config.fsmSavePath, machines.toHtml(keys));
+      util.writeHTML(`${config.keysSavePath}FSMs`, machines.toHtml(system.FSMs));
+      util.writeJSON(`${config.keysSavePath}Words`, system.wordStore);
     }
 
-    return keys;
+    return system;
   };
 
   const loadKeys = () => {
     let keys;
     try {
-      keys = util.readJSON(config.fsmSavePath);
+      keys = util.readJSON(config.keysSavePath);
     } catch (e) {
-      throw Error(`Invalid keys at ${config.fsmSavePath}`);
+      throw Error(`Invalid keys at ${config.keysSavePath}`);
     }
-    util.matchesAlphabet(Object.keys(keys), config.sourceAlphabet);
+
+    util.matchesAlphabet(Object.keys(keys.FSMs), config.sourceAlphabet);
     util.matchesAlphabet(
-      keys[config.sourceAlphabet[0]].alphabet,
+      keys.FSMs[config.sourceAlphabet[0]].alphabet,
       config.fsmAlphabet,
     );
 
-    return keys;
+    if (config.logging) {
+      console.log(`Loaded keys from: ${config.keysSavePath}`);
+    }
+
+    return crypt(keys.FSMs, keys.wordStore);
   };
 
   const encrypt = (input, system) => {
@@ -50,10 +57,9 @@ module.exports = (() => {
   };
 
   return {
-    makeKeys,
+    newKeys,
     loadKeys,
     decrypt,
     encrypt,
-    system: crypt,
   };
 })();

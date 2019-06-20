@@ -8,8 +8,7 @@ const analysis = require('./src/tools/analysis');
     return;
   }
 
-  const keys = cli.newKeys ? top.makeKeys() : top.loadKeys();
-  const system = top.system(keys);
+  const system = cli.newKeys ? top.newKeys() : top.loadKeys();
 
   if (cli.encrypt) {
     const encrypted = top.encrypt(cli.encrypt, system);
