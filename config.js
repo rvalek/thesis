@@ -4,7 +4,7 @@ module.exports = {
   fsmStates: 4,
   fsmTransitionFillPercent: 60,
   generateWordsPerCycle: 100,
-  minCipherLengthPerSourceLetter: 3,
+  minCipherLengthPerSourceLetter: 4,
   keysSavePath: './resources/keys',
   logging: true,
 };
