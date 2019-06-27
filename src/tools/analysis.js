@@ -181,7 +181,7 @@ module.exports = (() => {
 
   const languageSimilarity = () => {
     const keys = machines.generate(...defaultKeysConfig);
-    const stringPerLanguge = Object.values(keys).map(fsm => util.generateArray(() => words._generateBalanced(fsm), 100).join(''));
+    const stringPerLanguge = Object.values(keys).map(fsm => Array.from({ length: 100 }, () => words._generateBalanced(fsm)).join(''));
     const corsPerLanguage = stringPerLanguge.map((str, i) => stringPerLanguge.reduce((acc, next, j) => (j !== i ? [...acc, strSim.compareTwoStrings(str, next)] : acc), []));
     const avgCorPerLanguage = corsPerLanguage.map(cors => cors.reduce((acc, next) => acc + next) / cors.length);
     const totalAverage = avgCorPerLanguage.reduce((acc, next) => acc + next) / avgCorPerLanguage.length;

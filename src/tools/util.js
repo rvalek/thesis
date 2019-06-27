@@ -48,10 +48,6 @@ module.exports = (() => {
     );
   };
 
-  const generateArray = (producer, length) => Array(length)
-    .fill()
-    .map(producer);
-
   const shuffle = ([...a]) => {
     for (let i = a.length - 1; i > 0; i -= 1) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -93,7 +89,6 @@ module.exports = (() => {
     writeHTML,
     matchesAlphabet,
     latinAlphabet,
-    generateArray,
     shuffle,
     asHalves,
     addTiming,

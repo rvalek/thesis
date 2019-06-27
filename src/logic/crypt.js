@@ -6,7 +6,7 @@ module.exports = (FSMs, pregeneratedWords = null) => {
   const _generateWordsPerCycle = config.generateWordsPerCycle;
   const _minLengthPerLetter = config.minCipherLengthPerSourceLetter;
 
-  const _genWords = (fsm, numberOfWords) => util.generateArray(() => words.generate(fsm, _minLengthPerLetter), numberOfWords);
+  const _genWords = (fsm, numberOfWords) => Array.from({ length: numberOfWords }, () => words.generate(fsm, _minLengthPerLetter));
 
   const wordStore = pregeneratedWords || Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
     ...acc,

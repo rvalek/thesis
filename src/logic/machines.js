@@ -18,7 +18,7 @@ module.exports = (() => {
   ) => {
     const newFsm = _baseFsm(
       alphabet,
-      util.generateArray((_, i) => `s${i}`, numStates),
+      Array.from({ length: numStates }, (_, i) => `s${i}`),
     );
 
     const selectTargetState = () => (Math.round(Math.random() <= transitionFillPercent / 100) ? [util.getRandomElement(newFsm.states)] : []);
