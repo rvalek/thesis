@@ -6,7 +6,9 @@ module.exports = (FSMs, pregeneratedWords = null) => {
   const _generateWordsPerCycle = config.generateWordsPerCycle;
   const _minLengthPerLetter = config.minCipherLengthPerSourceLetter;
 
-  const _genWords = (fsm, numberOfWords) => Array.from({ length: numberOfWords }, () => words.generate(fsm, _minLengthPerLetter));
+  const _genWords = (fsm, numberOfWords) => Array.from({
+    length: numberOfWords,
+  }, () => words.generate(fsm, _minLengthPerLetter));
 
   const wordStore = pregeneratedWords || Object.entries(FSMs).reduce((acc, [letter, fsm]) => ({
     ...acc,
@@ -133,8 +135,7 @@ module.exports = (FSMs, pregeneratedWords = null) => {
   };
 
   // Produces a cipher string for a given source string.
-  const encrypt = ([...sourceText]) => sourceText
-    .map(letter => _nextWordForLetter(letter))
+  const encrypt = sourceText => Array.from(sourceText, letter => _nextWordForLetter(letter))
     .join('') + _generateParityCipher(sourceText);
 
   return {

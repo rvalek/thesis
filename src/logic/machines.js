@@ -18,7 +18,9 @@ module.exports = (() => {
   ) => {
     const newFsm = _baseFsm(
       alphabet,
-      Array.from({ length: numStates }, (_, i) => `s${i}`),
+      Array.from({
+        length: numStates,
+      }, (_, i) => `s${i}`),
     );
 
     const selectTargetState = () => (Math.round(Math.random() <= transitionFillPercent / 100) ? [util.getRandomElement(newFsm.states)] : []);
@@ -166,7 +168,7 @@ module.exports = (() => {
   };
 
   const generate = (letters = config.sourceAlphabet, [...alphabet] = config.fsmAlphabet, numStates = config.fsmStates) => {
-    const symbolCounter = new Map([...alphabet].map(symbol => [symbol, 0]));
+    const symbolCounter = new Map(alphabet.map(symbol => [symbol, 0]));
     const fsmsPerSymbol = Math.ceil(letters.length / alphabet.length);
 
     return [...letters].reduce(
