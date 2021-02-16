@@ -4,4 +4,4 @@ Run **npm i** after cloning.
 Run **node index.js -h** for usage info.
 
 Credits:
-  FSM handling was inspired inspired by https://github.com/izuzak/noam.
+  FSM handling was inspired by https://github.com/izuzak/noam.
